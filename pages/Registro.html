@@ -11,7 +11,7 @@
     <div class="main">
         <h1>Registro</h1>
         <h3>Digite sus datos</h3>
-        <form id="registro" enctype="multipart/form-data">
+        <form id="registro" enctype="multipart/form-data" onsubmit="return validarFormulario(event)">
             <!-- Campos de texto -->
             <label for="nombre_usuario">Nombre</label>
             <input type="text" id="nombre_usuario" name="nombre_usuario" placeholder="Digite su Nombre" required>
@@ -27,6 +27,7 @@
 
             <label for="contrasena_usuario">Contraseña</label>
             <input type="password" id="contrasena_usuario" name="contrasena_usuario" placeholder="Digite su contraseña" required>
+            <small>La contraseña debe tener al menos 8 caracteres, incluyendo una mayúscula, un número y un carácter especial.</small>
 
             <!-- Foto -->
             <label for="photo">Foto</label>
@@ -36,11 +37,11 @@
             </div>
 
             <div id="image-preview-container">
-                <img id="image-preview" style="display: none;" />
+                <img id="image-preview" style="display: none;" alt="Vista previa de la imagen" />
             </div>
 
              <div class="wrap">
-                <button type="button" onclick="confirmarRegistro()">Registrarse</button>
+                <button type="submit">Registrarse</button>
             </div>
         </form>
         <p>¿Ya estás registrado? <a href="/login" style="text-decoration: none;">Iniciar sesión</a></p>
@@ -83,6 +84,38 @@
 
             request.open("POST", "/cregistrarse");
             request.send(formData);
+        }
+
+        function validarFormulario(event) {
+            event.preventDefault();
+            
+            var nombre = document.getElementById('nombre_usuario').value;
+            var apellido1 = document.getElementById('apellido1_usuario').value;
+            var apellido2 = document.getElementById('apellido2_usuario').value;
+            var correo = document.getElementById('correo_usuario').value;
+            var contrasena = document.getElementById('contrasena_usuario').value;
+            var foto = document.getElementById('foto_usuario').value;
+
+            if (!nombre || !apellido1 || !apellido2 || !correo || !contrasena || !foto) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Campos incompletos',
+                    text: 'Por favor, complete todos los campos del formulario.',
+                });
+                return false;
+            }
+
+            if (!validarContrasena(contrasena)) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Contraseña inválida',
+                    text: 'La contraseña debe tener al menos 8 caracteres, incluyendo una mayúscula, un número y un carácter especial.',
+                });
+                return false;
+            }
+
+            confirmarRegistro();
+            return false;
         }
 
         function confirmarRegistro() {

@@ -3,23 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inicio de Sesion</title>
-    <link rel="stylesheet" href="../static/css/reg.css">
+    <title>Inicio de Sesión</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            background: url('../static/imgs/semilla.png') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .main {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 400px;
+            box-sizing: border-box;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        h1 {
+            color: #e27611;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+
+        h3 {
+            color: #555;
+            margin-bottom: 20px;
+            font-weight: 300;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: bold;
+            text-align: left;
+        }
+
+        input[type="email"],
+        input[type="password"],
+        select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+            background-color: #f9f9f9;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #e27611;
+            outline: none;
+            box-shadow: 0 0 5px rgba(226, 118, 17, 0.5);
+        }
+
+        select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 1em;
+        }
+
+        button {
+            background-color: #e4640e;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #cf5d0d;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        a {
+            color: #e27611;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: #cf5d0d;
+            text-decoration: underline;
+        }
+
+        .tipo-usuario {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .tipo-usuario p {
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        @media (max-width: 600px) {
+            .main {
+                padding: 20px;
+                width: 90%;
+            }
+
+            button, input, select {
+                font-size: 14px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="main">
-        <h1>Inicio de Sesion</h1>
+        <h1>Inicio de Sesión</h1>
         <h3>Digite sus datos</h3>
-        <form id="login" enctype="multipart/form-data">
-
-            <div class="main">
-                <p>Selecione el tipo de inicio</p>
-                <select name="tipo_usuario" id="tipo_usuario">
+        <form id="login" onsubmit="return ingresar(event)">
+            <div class="tipo-usuario">
+                <p>Seleccione el tipo de inicio:</p>
+                <select name="tipo_usuario" id="tipo_usuario" required>
+                    <option value="">-- Seleccione --</option>
                     <option value="empleado">Empleado</option>
                     <option value="usuario">Usuario</option>
                 </select>
             </div>
-            <br>
 
             <label for="correo_usuario">Correo Electrónico</label>
             <input type="email" id="correo_usuario" name="correo_usuario" placeholder="Digite su correo" required>
@@ -27,23 +155,26 @@
             <label for="contrasena_usuario">Contraseña</label>
             <input type="password" id="contrasena_usuario" name="contrasena_usuario" placeholder="Digite su contraseña" required>
 
-            <div class="wrap">
-                <button type="button" onclick="ingresar()">Iniciar Sesión</button>
-            </div>
+            <button type="submit">Iniciar Sesión</button>
         </form>
-        <p>¿No estás registrado? <a href="/RegUser" style="text-decoration: none;">Registrarse</a></p>
+        <p>¿No estás registrado? <a href="/RegUser">Registrarse</a></p>
     </div>
 
     <script>
-        function ingresar() {
+        function ingresar(event) {
+            event.preventDefault();
             var formData = document.forms['login'];
             var tipo_usuario = formData.elements['tipo_usuario'].value;
             var correo = formData.elements['correo_usuario'].value;
             var contrasena = formData.elements['contrasena_usuario'].value;
 
-            if(correo.trim() === '' || contrasena.trim() === '') {
-                alert("Por favor complete todos los campos.");
-                return;
+            if(tipo_usuario === '' || correo.trim() === '' || contrasena.trim() === '') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Campos incompletos',
+                    text: 'Por favor complete todos los campos.',
+                });
+                return false;
             }
 
             var request = new XMLHttpRequest();
@@ -53,20 +184,33 @@
 
             request.onload = function () {
                 if (request.status === 400) {
-                    alert("El usuario o la contraseña es incorrecta");
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error de autenticación',
+                        text: 'El usuario o la contraseña es incorrecta.',
+                    });
                 } else if (request.status === 201) {
                     var respuesta = request.response;
                     var id = (tipo_usuario === "usuario") ? respuesta.correo_usuario : respuesta.cedula_empleado;
                     localStorage.setItem("id", id);
-                    window.location.href = (tipo_usuario === "usuario") ? "/escritorioUsuario" : "/escritorioEmpleado";
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Bienvenido!',
+                        text: 'Inicio de sesión exitoso.',
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.href = (tipo_usuario === "usuario") ? "/escritorioUsuario" : "/escritorioEmpleado";
+                    });
                 }
             };
 
-            // Enviar la solicitud POST
             request.open("POST", requestURL);
             request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
             request.responseType = "json";
             request.send(strData);
+
+            return false;
         }
     </script>
 </body>

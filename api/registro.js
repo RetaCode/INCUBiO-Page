@@ -1,6 +1,8 @@
 const Pool = require('pg').Pool
 const multer = require('multer');
 const upload = multer();
+const bcrypt = require('bcrypt');
+
 const pool = new Pool({
   host: "localhost",
   user: "Soporte",
@@ -9,29 +11,49 @@ const pool = new Pool({
   port: 5432,
 });
 
+const saltRounds = 10; // Número de rondas para el hashing
+
 //--------------------------------------------------------------Inicio de sesion--------------------------------------------------------------
-const loginUsuario = (request, response) => {
+const loginUsuario = async (request, response) => {
   const { correo_usuario, contrasena_usuario } = request.body;
-  const query = "SELECT * FROM usuario WHERE correo_usuario = $1 AND contrasena_usuario = $2";
-  pool.query(query, [correo_usuario, contrasena_usuario], (error, results) => {
-    if (error || results.rows.length === 0) {
-      response.status(400).send('Error');
-    } else {
-      response.status(201).send(results.rows[0]);
+  const query = "SELECT * FROM usuario WHERE correo_usuario = $1";
+  try {
+    const results = await pool.query(query, [correo_usuario]);
+    if (results.rows.length === 0) {
+      return response.status(400).send('Usuario no encontrado');
     }
-  });
+    const user = results.rows[0];
+    const match = await bcrypt.compare(contrasena_usuario, user.contrasena_usuario);
+    if (match) {
+      response.status(201).send(user);
+    } else {
+      response.status(400).send('Contraseña incorrecta');
+    }
+  } catch (error) {
+    console.error('Error en login:', error);
+    response.status(500).send('Error interno del servidor');
+  }
 };
 
-const loginEmpleado = (request, response) => {
+const loginEmpleado = async (request, response) => {
   const { correo_usuario, contrasena_usuario } = request.body;
-  const query = "SELECT * FROM empleado WHERE correo = $1 AND clave = $2";
-  pool.query(query, [correo_usuario, contrasena_usuario], (error, results) => {
-    if (error || results.rows.length === 0) {
-      response.status(400).send('Error');
-    } else {
-      response.status(201).send(results.rows[0]);
+  const query = "SELECT * FROM empleado WHERE correo = $1";
+  try {
+    const results = await pool.query(query, [correo_usuario]);
+    if (results.rows.length === 0) {
+      return response.status(400).send('Empleado no encontrado');
     }
-  });
+    const empleado = results.rows[0];
+    const match = await bcrypt.compare(contrasena_usuario, empleado.clave);
+    if (match) {
+      response.status(201).send(empleado);
+    } else {
+      response.status(400).send('Contraseña incorrecta');
+    }
+  } catch (error) {
+    console.error('Error en login de empleado:', error);
+    response.status(500).send('Error interno del servidor');
+  }
 };
 
 
@@ -53,7 +75,7 @@ const loginEmpleado = (request, response) => {
 
 
 const resgistrarseUsuario = (request, response) => {
-  upload.single('foto_usuario')(request, response, function (err) {
+  upload.single('foto_usuario')(request, response, async function (err) {
     if (err instanceof multer.MulterError) {
       return response.status(400).json({mensaje: 'Error al subir el archivo', error: err.message});
     } else if (err) {
@@ -64,20 +86,18 @@ const resgistrarseUsuario = (request, response) => {
     let foto_usuario = null;
 
     if (request.file) {
-      // Convertir la imagen a Base64
       foto_usuario = request.file.buffer.toString('base64');
     }
 
-    const query = "INSERT INTO usuario (nombre_usuario, apellido1_usuario, apellido2_usuario, correo_usuario, contrasena_usuario, foto_usuario) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *";
-
-    pool.query(query, [nombre_usuario, apellido1_usuario, apellido2_usuario, correo_usuario, contrasena_usuario, foto_usuario], (error, results) => {
-      if (error) {
-        console.error('Error al registrar usuario:', error);
-        response.status(400).json({mensaje: 'No se pudo registrar', error: error.message});
-      } else {
-        response.status(201).json({mensaje: 'Usuario registrado exitosamente', usuario: results.rows[0]});
-      }
-    });
+    try {
+      const hashedPassword = await bcrypt.hash(contrasena_usuario, saltRounds);
+      const query = "INSERT INTO usuario (nombre_usuario, apellido1_usuario, apellido2_usuario, correo_usuario, contrasena_usuario, foto_usuario) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *";
+      const results = await pool.query(query, [nombre_usuario, apellido1_usuario, apellido2_usuario, correo_usuario, hashedPassword, foto_usuario]);
+      response.status(201).json({mensaje: 'Usuario registrado exitosamente', usuario: results.rows[0]});
+    } catch (error) {
+      console.error('Error al registrar usuario:', error);
+      response.status(400).json({mensaje: 'No se pudo registrar', error: error.message});
+    }
   });
 }
 
