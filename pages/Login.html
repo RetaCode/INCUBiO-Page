@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio de Sesion</title>
+    <link rel="stylesheet" href="../static/css/reg.css">
+</head>
+<body>
+    <div class="main">
+        <h1>Inicio de Sesion</h1>
+        <h3>Digite sus datos</h3>
+        <form id="login" enctype="multipart/form-data">
+
+            <div class="main">
+                <p>Selecione el tipo de inicio</p>
+                <select name="tipo_usuario" id="tipo_usuario">
+                    <option value="empleado">Empleado</option>
+                    <option value="usuario">Usuario</option>
+                </select>
+            </div>
+            <br>
+
+            <label for="correo_usuario">Correo Electrónico</label>
+            <input type="email" id="correo_usuario" name="correo_usuario" placeholder="Digite su correo" required>
+
+            <label for="contrasena_usuario">Contraseña</label>
+            <input type="password" id="contrasena_usuario" name="contrasena_usuario" placeholder="Digite su contraseña" required>
+
+            <div class="wrap">
+                <button type="button" onclick="ingresar()">Iniciar Sesión</button>
+            </div>
+        </form>
+        <p>¿No estás registrado? <a href="/RegUser" style="text-decoration: none;">Registrarse</a></p>
+    </div>
+
+    <script>
+        function ingresar() {
+            var formData = document.forms['login'];
+            var tipo_usuario = formData.elements['tipo_usuario'].value;
+            var correo = formData.elements['correo_usuario'].value;
+            var contrasena = formData.elements['contrasena_usuario'].value;
+
+            if(correo.trim() === '' || contrasena.trim() === '') {
+                alert("Por favor complete todos los campos.");
+                return;
+            }
+
+            var request = new XMLHttpRequest();
+            var requestURL = (tipo_usuario === "usuario") ? "/servicio-login-usuario" : "/servicio-login-empleado";
+            var strData = "correo_usuario=" + encodeURIComponent(correo) +
+                          "&contrasena_usuario=" + encodeURIComponent(contrasena);
+
+            request.onload = function () {
+                if (request.status === 400) {
+                    alert("El usuario o la contraseña es incorrecta");
+                } else if (request.status === 201) {
+                    var respuesta = request.response;
+                    var id = (tipo_usuario === "usuario") ? respuesta.correo_usuario : respuesta.cedula_empleado;
+                    localStorage.setItem("id", id);
+                    window.location.href = (tipo_usuario === "usuario") ? "/escritorioUsuario" : "/escritorioEmpleado";
+                }
+            };
+
+            // Enviar la solicitud POST
+            request.open("POST", requestURL);
+            request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            request.responseType = "json";
+            request.send(strData);
+        }
+    </script>
+</body>
+</html>

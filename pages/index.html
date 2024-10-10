@@ -1,11 +1,155 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hello Word</title>
+    <title>INCUBiO</title>
+    <link rel="stylesheet" href="../static/css/index.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
 </head>
 <body>
-    <h1>Hello Word</h1>
+    <header id="main-header">
+        <div class="logo">
+            <a href="#inicio">
+                <img src="../static/imgs/Logo plano.png" alt="Logo de la empresa">
+            </a>
+        </div>
+        <div class="auth-buttons">
+            <a href="/login" class="btn btn-login"><i class="fas fa-sign-in-alt"></i> Iniciar sesión</a>
+            <a href="/RegUser" class="btn btn-register"><i class="fas fa-user-plus"></i> Registrarse</a>
+        </div>
+    </header>
+
+    <main>
+        <section id="inicio" class="hero">
+            <img src="../static/imgs/fondo1.png" alt="Imagen de inicio">
+            
+        </section>
+
+        <section id="que-es" class="content-section">
+            <div class="container">
+                <h2>Qué es</h2>
+                <div class="info-box">
+                    <div class="image-container">
+                        <img src="../static/imgs/Germinadora.jpeg" alt="Imagen descriptiva">
+                    </div>
+                    <div class="text-container">
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat nisl ut dapibus.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider"></div>
+
+        <section id="objetivos" class="content-section">
+            <div class="container">
+                <h2>Objetivos</h2>
+                <div class="objectives-grid">
+                    <div class="objective">
+                        <i class="fas fa-chart-line"></i>
+                        <h3>Crecimiento</h3>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris.</p>
+                    </div>
+                    <div class="objective">
+                        <i class="fas fa-handshake"></i>
+                        <h3>Colaboración</h3>
+                        <p>Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus.</p>
+                    </div>
+                    <div class="objective">
+                        <i class="fas fa-lightbulb"></i>
+                        <h3>Innovación</h3>
+                        <p>Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider"></div>
+
+        <section id="quienes-somos" class="content-section">
+            <div class="container">
+                <h2>Quiénes somos</h2>
+                <p>Somos un equipo diverso y apasionado, comprometido con la excelencia y la innovación. Cada miembro aporta habilidades únicas y experiencias valiosas a nuestro equipo.</p>
+                <div class="team-grid">
+                    <div class="team-member">
+                        <div class="avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <h3>Ariel Campos    (DG) </h3>
+                    </div>
+                    <div class="team-member">
+                        <div class="avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <h3>Esteban Retana (DW)</h3>
+                    </div>
+                    <div class="team-member">
+                        <div class="avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <h3>Daniela Navarro (MP)</h3>
+                    </div>
+                    <div class="team-member">
+                        <div class="avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <h3>Luis Ureña      (MP)</h3>
+                    </div>
+                    <div class="team-member">
+                        <div class="avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <h3>Abat Ocampo   (MP)</h3>
+                    </div>
+                    <div class="team-member">
+                        <div class="avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <h3>Nicole Valverde   (MP)</h3>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider"></div>
+
+        <section id="mas-sobre-nosotros" class="content-section">
+            <div class="container">
+                <h2>Más sobre nosotros</h2>
+                <p>Descubre nuestra historia, valores y lo que nos hace únicos en el mercado.</p>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <img src="https://picsum.photos/seed/picsum/400/300" alt="Imagen 1">
+                        <h3>Nuestra Historia</h3>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris.</p>
+                    </div>
+                    <div class="info-item">
+                        <img src="https://picsum.photos/seed/lorem/400/300" alt="Imagen 2">
+                        <h3>Nuestros Valores</h3>
+                        <p>Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus.</p>
+                    </div>
+                    <div class="info-item">
+                        <img src="https://picsum.photos/seed/ipsum/400/300" alt="Imagen 3">
+                        <h3>Nuestro Impacto</h3>
+                        <p>Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Mi Empresa. Todos los derechos reservados.</p>
+            <div class="social-links">
+                
+                <a href="https://www.instagram.com/incubio.cr?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-linkedin"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../static/scripts/index.js"></script>
 </body>
 </html>
