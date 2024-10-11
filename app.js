@@ -1,5 +1,7 @@
 const express = require("express");
-const morgan = require("morgan");  
+const morgan = require("morgan"); 
+const jwt = require('jsonwebtoken');  
+const bcrypt = require('bcrypt'); 
 const app = express();
 const port = 3000;
 
@@ -34,6 +36,14 @@ app.get("/RegUser", (req, res) => {
 app.get("/login", (req, res) => {
   res.sendFile(path.join(__dirname, 'pages', 'Login.html'));
 });
+
+
+
+app.get("/EscritorioEmpleado", (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'escritorioEmpleado.html'));
+});
+
+
 
 app.get("/plantas", (req, res) => {
   res.send("");
