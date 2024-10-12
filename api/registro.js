@@ -1,6 +1,4 @@
-const Pool = require('pg').Pool
-const multer = require('multer');
-const upload = multer();
+const Pool = require('pg').Pool;
 const bcrypt = require('bcrypt');
 
 const pool = new Pool({
@@ -11,89 +9,96 @@ const pool = new Pool({
   port: 5432,
 });
 
-const saltRounds = 10; // Número de rondas para el hashing
+const saltRounds = 10;
 
-//--------------------------------------------------------------Inicio de sesion--------------------------------------------------------------
+//--------------------------------------------------------------Inicio de sesión Usuario--------------------------------------------------------------
 const loginUsuario = async (request, response) => {
   const { correo_usuario, contrasena_usuario } = request.body;
   const query = "SELECT * FROM usuario WHERE correo_usuario = $1";
+  
   try {
     const results = await pool.query(query, [correo_usuario]);
+    
     if (results.rows.length === 0) {
-      return response.status(400).send('Usuario no encontrado');
+      return response.status(400).json({ mensaje: 'Usuario no encontrado' });
     }
+
     const user = results.rows[0];
     const match = await bcrypt.compare(contrasena_usuario, user.contrasena_usuario);
+    
     if (match) {
-      response.status(201).send(user);
+      response.status(200).json({ mensaje: 'Inicio de sesión exitoso', usuario: user });
     } else {
-      response.status(400).send('Contraseña incorrecta');
+      response.status(400).json({ mensaje: 'Contraseña incorrecta' });
     }
   } catch (error) {
     console.error('Error en login:', error);
-    response.status(500).send('Error interno del servidor');
+    response.status(500).json({ mensaje: 'Error interno del servidor' });
   }
 };
 
+//--------------------------------------------------------------Inicio de sesión Empleado--------------------------------------------------------------
 const loginEmpleado = async (request, response) => {
-  const { correo_usuario, contrasena_usuario } = request.body;
-  const query = "SELECT * FROM empleado WHERE correo = $1";
+  const { correo_empleado, contrasena_empleado } = request.body;
+  const query = "SELECT * FROM empleado WHERE correo_empleado = $1";
+  
   try {
-    const results = await pool.query(query, [correo_usuario]);
+    const results = await pool.query(query, [correo_empleado]);
+    
     if (results.rows.length === 0) {
-      return response.status(400).send('Empleado no encontrado');
+      return response.status(400).json({ mensaje: 'Empleado no encontrado' });
     }
+
     const empleado = results.rows[0];
-    const match = await bcrypt.compare(contrasena_usuario, empleado.clave);
+    const match = await bcrypt.compare(contrasena_empleado, empleado.contrasena_empleado);
+    
     if (match) {
-      response.status(201).send(empleado);
+      response.status(200).json({ mensaje: 'Inicio de sesión exitoso', empleado: empleado });
     } else {
-      response.status(400).send('Contraseña incorrecta');
+      response.status(400).json({ mensaje: 'Contraseña incorrecta' });
     }
   } catch (error) {
     console.error('Error en login de empleado:', error);
-    response.status(500).send('Error interno del servidor');
+    response.status(500).json({ mensaje: 'Error interno del servidor' });
   }
 };
 
+//--------------------------------------------------------------Registro de Empleado--------------------------------------------------------------
+const registrarseEmpleado = async (request, response) => {
+  const { nombre_empleado, apellido1_empleado, apellido2_empleado, cedula_empleado, correo_empleado, contrasena_empleado, telefono } = request.body;
+  let foto_empleado = null;
 
-const resgistrarseUsuario = (request, response) => {
-  upload.single('foto_usuario')(request, response, async function (err) {
-    if (err instanceof multer.MulterError) {
-      return response.status(400).json({mensaje: 'Error al subir el archivo', error: err.message});
-    } else if (err) {
-      return response.status(500).json({mensaje: 'Error del servidor', error: err.message});
+  if (request.file) {
+    foto_empleado = request.file.buffer.toString('base64');
+  }
+
+  try {
+    const hashedPassword = await bcrypt.hash(contrasena_empleado, saltRounds);
+    const query = "INSERT INTO empleado (nombre_empleado, apellido1_empleado, apellido2_empleado, cedula_empleado, correo_empleado, contrasena_empleado, telefono, foto_empleado) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *";
+    const values = [nombre_empleado, apellido1_empleado, apellido2_empleado, cedula_empleado, correo_empleado, hashedPassword, telefono, foto_empleado];
+    
+    const results = await pool.query(query, values);
+    response.status(201).json({ mensaje: 'Empleado registrado exitosamente', empleado: results.rows[0] });
+  } catch (error) {
+    console.error('Error al registrar empleado:', error);
+    if (error.code === '23505' && error.constraint === 'empleado_correo_empleado_key') {
+      response.status(400).json({ mensaje: 'El correo electrónico ya está en uso' });
+    } else if (error.code === '23505' && error.constraint === 'empleado_cedula_empleado_key') {
+      response.status(400).json({ mensaje: 'La cédula ya está registrada' });
+    } else {
+      response.status(400).json({ mensaje: 'No se pudo registrar el empleado', error: error.message });
     }
-
-    const { nombre_usuario, apellido1_usuario, apellido2_usuario, correo_usuario, contrasena_usuario } = request.body;
-    let foto_usuario = null;
-
-    if (request.file) {
-      foto_usuario = request.file.buffer.toString('base64');
-    }
-
-    try {
-      const hashedPassword = await bcrypt.hash(contrasena_usuario, saltRounds);
-      const query = "INSERT INTO usuario (nombre_usuario, apellido1_usuario, apellido2_usuario, correo_usuario, contrasena_usuario, foto_usuario) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *";
-      const results = await pool.query(query, [nombre_usuario, apellido1_usuario, apellido2_usuario, correo_usuario, hashedPassword, foto_usuario]);
-      response.status(201).json({mensaje: 'Usuario registrado exitosamente', usuario: results.rows[0]});
-    } catch (error) {
-      console.error('Error al registrar usuario:', error);
-      response.status(400).json({mensaje: 'No se pudo registrar', error: error.message});
-    }
-  });
-}
-
-module.exports = {
-  resgistrarseUsuario,
+  }
 };
 
-
+// Registro de Usuario (placeholder)
+const registrarseUsuario = async (request, response) => {
+  response.status(501).send('Función no implementada');
+};
 
 module.exports = {
   loginUsuario,
   loginEmpleado,
-  resgistrarseUsuario
+  registrarseEmpleado,
+  registrarseUsuario
 };
-
-

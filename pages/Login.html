@@ -177,21 +177,23 @@
                 return false;
             }
 
-            var request = new XMLHttpRequest();
             var requestURL = (tipo_usuario === "usuario") ? "/servicio-login-usuario" : "/servicio-login-empleado";
-            var strData = "correo_usuario=" + encodeURIComponent(correo) +
-                          "&contrasena_usuario=" + encodeURIComponent(contrasena);
+            var data = {
+                [tipo_usuario === "usuario" ? "correo_usuario" : "correo_empleado"]: correo,
+                [tipo_usuario === "usuario" ? "contrasena_usuario" : "contrasena_empleado"]: contrasena
+            };
 
-            request.onload = function () {
-                if (request.status === 400) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error de autenticación',
-                        text: 'El usuario o la contraseña es incorrecta.',
-                    });
-                } else if (request.status === 201) {
-                    var respuesta = request.response;
-                    var id = (tipo_usuario === "usuario") ? respuesta.correo_usuario : respuesta.cedula_empleado;
+            fetch(requestURL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.mensaje === 'Inicio de sesión exitoso') {
+                    var id = tipo_usuario === "usuario" ? data.usuario.correo_usuario : data.empleado.cedula_empleado;
                     localStorage.setItem("id", id);
                     Swal.fire({
                         icon: 'success',
@@ -200,15 +202,24 @@
                         timer: 1500,
                         showConfirmButton: false
                     }).then(() => {
-                        window.location.href = (tipo_usuario === "usuario") ? "/escritorioUsuario" : "/escritorioEmpleado";
+                        window.location.href = tipo_usuario === "usuario" ? "/escritorioUsuario" : "/escritorioEmpleado";
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error de autenticación',
+                        text: data.mensaje,
                     });
                 }
-            };
-
-            request.open("POST", requestURL);
-            request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-            request.responseType = "json";
-            request.send(strData);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Ocurrió un error al intentar iniciar sesión.',
+                });
+            });
 
             return false;
         }
