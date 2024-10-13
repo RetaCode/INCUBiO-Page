@@ -148,13 +148,28 @@
             });
 
             // Verificar el token al cargar la página
-            // const token = localStorage.getItem('token');
-            // if (!token) {
-            //     window.location.href = '/login';
-            // }
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/login';
+            }
+            
+            fetch('/EscritorioEmpleado', {
+                method: 'GET',
+                headers: {
+                    'Authorization': localStorage.getItem('token'), // Enviar el token
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Acceso permitido:', data);
+                // Maneja la respuesta exitosa
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Mostrar mensaje de error o redirigir si el token no es válido
+            });
 
-            // Aquí puedes agregar la lógica para cargar los datos del empleado usando el token
-        });
+            });
     </script>
 </body>
 </html>

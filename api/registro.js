@@ -14,52 +14,64 @@ const saltRounds = 10;
 //--------------------------------------------------------------Inicio de sesión Usuario--------------------------------------------------------------
 const loginUsuario = async (request, response) => {
   const { correo_usuario, contrasena_usuario } = request.body;
+  console.log('Intentando login para usuario:', correo_usuario);
   const query = "SELECT * FROM usuario WHERE correo_usuario = $1";
   
   try {
     const results = await pool.query(query, [correo_usuario]);
+    console.log('Resultados de la consulta:', results.rows);
     
     if (results.rows.length === 0) {
-      return response.status(400).json({ mensaje: 'Usuario no encontrado' });
+      console.log('Usuario no encontrado');
+      return { error: 'Usuario no encontrado' };
     }
 
     const user = results.rows[0];
+    console.log('Comparando contraseñas para usuario:', user.correo_usuario);
     const match = await bcrypt.compare(contrasena_usuario, user.contrasena_usuario);
     
     if (match) {
-      response.status(200).json({ mensaje: 'Inicio de sesión exitoso', usuario: user });
+      console.log('Contraseña correcta para usuario:', user.correo_usuario);
+      return { usuario: user };
     } else {
-      response.status(400).json({ mensaje: 'Contraseña incorrecta' });
+      console.log('Contraseña incorrecta para usuario:', user.correo_usuario);
+      return { error: 'Contraseña incorrecta' };
     }
   } catch (error) {
     console.error('Error en login:', error);
-    response.status(500).json({ mensaje: 'Error interno del servidor' });
+    return { error: 'Error interno del servidor' };
   }
 };
 
 //--------------------------------------------------------------Inicio de sesión Empleado--------------------------------------------------------------
 const loginEmpleado = async (request, response) => {
   const { correo_empleado, contrasena_empleado } = request.body;
+  console.log('Intentando login para empleado:', correo_empleado);
   const query = "SELECT * FROM empleado WHERE correo_empleado = $1";
   
   try {
     const results = await pool.query(query, [correo_empleado]);
+    console.log('Resultados de la consulta:', results.rows);
     
     if (results.rows.length === 0) {
-      return response.status(400).json({ mensaje: 'Empleado no encontrado' });
+      console.log('Empleado no encontrado');
+      return { error: 'Empleado no encontrado' };
     }
 
     const empleado = results.rows[0];
+    console.log('Comparando contraseñas para empleado:', empleado.correo_empleado);
     const match = await bcrypt.compare(contrasena_empleado, empleado.contrasena_empleado);
     
     if (match) {
-      response.status(200).json({ mensaje: 'Inicio de sesión exitoso', empleado: empleado });
+      console.log('Contraseña correcta para empleado:', empleado.correo_empleado);
+      return { empleado: empleado };
     } else {
-      response.status(400).json({ mensaje: 'Contraseña incorrecta' });
+      console.log('Contraseña incorrecta para empleado:', empleado.correo_empleado);
+      return { error: 'Contraseña incorrecta' };
     }
   } catch (error) {
     console.error('Error en login de empleado:', error);
-    response.status(500).json({ mensaje: 'Error interno del servidor' });
+    return { error: 'Error interno del servidor' };
   }
 };
 
@@ -91,9 +103,38 @@ const registrarseEmpleado = async (request, response) => {
   }
 };
 
-// Registro de Usuario (placeholder)
+// //--------------------------------------------------------------Registro de Usuario //--------------------------------------------------------------
 const registrarseUsuario = async (request, response) => {
-  response.status(501).send('Función no implementada');
+  console.log('Iniciando registro de usuario');
+  const { nombre_usuario, apellido1_usuario, apellido2_usuario, correo_usuario, contrasena_usuario } = request.body;
+  let foto_usuario = null;
+
+  console.log('Datos recibidos:', { nombre_usuario, apellido1_usuario, apellido2_usuario, correo_usuario });
+
+  if (request.file) {
+    foto_usuario = request.file.buffer.toString('base64');
+    console.log('Foto de usuario recibida');
+  }
+
+  try {
+    const hashedPassword = await bcrypt.hash(contrasena_usuario, saltRounds);
+    console.log('Contraseña hasheada');
+
+    const query = "INSERT INTO usuario (nombre_usuario, apellido1_usuario, apellido2_usuario, correo_usuario, contrasena_usuario, foto_usuario) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *";
+    const values = [nombre_usuario, apellido1_usuario, apellido2_usuario, correo_usuario, hashedPassword, foto_usuario];
+    
+    console.log('Ejecutando query de inserción');
+    const results = await pool.query(query, values);
+    console.log('Usuario registrado exitosamente');
+    response.status(201).json({ mensaje: 'Usuario registrado exitosamente', usuario: results.rows[0] });
+  } catch (error) {
+    console.error('Error al registrar usuario:', error);
+    if (error.code === '23505' && error.constraint === 'usuario_correo_usuario_key') {
+      response.status(400).json({ mensaje: 'El correo electrónico ya está en uso' });
+    } else {
+      response.status(400).json({ mensaje: 'No se pudo registrar el usuario', error: error.message });
+    }
+  }
 };
 
 module.exports = {
