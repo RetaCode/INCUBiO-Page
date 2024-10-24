@@ -3,7 +3,7 @@ const morgan = require("morgan");
 const multer = require('multer');
 const path = require('path');
 const jwt = require('jsonwebtoken');
-const apis2 = require('./api/registro');
+const registro = require('./api/registro'); // Importa las funciones del archivo registro.js
 const app = express();
 const port = 3000;
 
@@ -15,38 +15,30 @@ const upload = multer({
 });
 
 // --------------------------------------------- Clave secreta para firmar los tokens JWT ---------------------------------------------
-const JWT_SECRET = '1Ncu310'; 
+const SECRET_KEY = '1Ncu310'; 
 
 // --------------------------------------------- Middleware para verificar el token JWT ---------------------------------------------
-const verificarToken = (req, res, next) => {
-  try {
-    // Obtener el token del header Authorization o de la query string
-    let token = req.headers.authorization ? req.headers.authorization.split(' ')[1] : null;
 
-    // Si no hay token en los headers, buscar en la query string
-    if (!token && req.query.token) {
-      token = req.query.token;
-    }
+function verificarToken(req, res, next) {
+    const token = req.headers['authorization']; // Debes enviar el token en el encabezado "authorization"
+    
+
 
     if (!token) {
-      return res.status(401).json({
-        mensaje: 'Acceso denegado, token no encontrado',
-        redirect: '/login'
-      });
+        return res.status(403).json({ mensaje: 'No se proporcionó un token' });
     }
 
-    // Verificar el token
-    const decoded = jwt.verify(token, JWT_SECRET);
-    req.user = decoded;
-    next();
-  } catch (error) {
-    console.error('Error de verificación de token:', error);
-    return res.status(403).json({
-      mensaje: 'Token no válido',
-      redirect: '/login'
-    });
-  }
-};
+    try {
+      const decoded = jwt.verify(token, SECRET_KEY);
+        req.usuarioId = decoded.id; // Guardar el ID del usuario decodificado en la solicitud
+        next(); // Continuar con la siguiente función en la cadena
+    } catch (error) {
+        return res.status(401).json({ mensaje: 'Token inválido o expirado' });
+    }
+}
+
+module.exports = verificarToken;
+
 
 // --------------------------------------------- Configuración de Middleware ---------------------------------------------
 app.use(morgan('dev'));
@@ -74,85 +66,50 @@ app.get("/login", (req, res) => {
 });
 
 // --------------------------------------------- Rutas protegidas (necesitan token JWT) ---------------------------------------------
+
+app.get('/verificar-token', verificarToken, (req, res) => {
+  res.send({ mensaje: 'Token válido', usuario: req.usuario });
+});
+
 app.get("/EscritorioEmpleado", verificarToken, (req, res) => {
-  if (req.user.rol !== 'empleado') {
-    return res.status(403).json({ mensaje: 'Acceso no autorizado' });
-  }
   res.sendFile(path.join(__dirname, 'pages', 'escritorioEmpleado.html'));
 });
 
 app.get("/registroEmpleado", verificarToken, (req, res) => {
-  if (req.user.rol !== 'empleado') {
-    return res.status(403).json({ mensaje: 'Acceso no autorizado' });
-  }
   res.sendFile(path.join(__dirname, 'pages', 'FormEmpleado.html'));
 });
 
 app.get("/EscritorioUsuario", verificarToken, (req, res) => {
-  if (req.user.rol !== 'usuario') {
-    return res.status(403).json({ mensaje: 'Acceso no autorizado' });
-  }
-  res.sendFile(path.join(__dirname, 'pages', 'escritorioUsuaro.html'));
+  res.sendFile(path.join(__dirname, 'pages', 'escritorioUsuario.html'));
 });
 
-// ----------------------------------------------- LLamadas a las APIs -----------------------------------------------
-// Servicio de login de usuario
+// --------------------------------------------- Rutas de inicio de sesión y registro ---------------------------------------------
 app.post('/servicio-login-usuario', async (req, res) => {
-  try {
-    const resultado = await apis2.loginUsuario(req);
-    if (resultado.usuario) {
-      const token = jwt.sign(
-        { 
-          id: resultado.usuario.id_usuario, 
-          rol: 'usuario',
-          correo: resultado.usuario.correo_usuario
-        }, 
-        JWT_SECRET, 
-        { expiresIn: '24h' }
-      );
-      res.json({ 
-        mensaje: 'Inicio de sesión exitoso', 
-        token, 
-        usuario: resultado.usuario 
-      });
-    } else {
-      res.status(400).json({ mensaje: resultado.error });
-    }
-  } catch (error) {
-    res.status(500).json({ mensaje: 'Error en el servidor', error: error.message });
+  const resultado = await registro.loginUsuario(req, res);
+  if (resultado.error) {
+    return res.status(400).json({ mensaje: resultado.error });
   }
+  const token = jwt.sign({ id_usuario: resultado.usuario.id_usuario }, SECRET_KEY, { expiresIn: '1h' });
+  return res.status(200).json({
+    mensaje: 'Inicio de sesión exitoso',
+    token
+  });
 });
 
-// Servicio de login de empleado
 app.post('/servicio-login-empleado', async (req, res) => {
-  try {
-    const resultado = await apis2.loginEmpleado(req);
-    if (resultado.empleado) {
-      const token = jwt.sign(
-        { 
-          id: resultado.empleado.id_empleado, 
-          rol: 'empleado',
-          correo: resultado.empleado.correo_empleado
-        }, 
-        JWT_SECRET, 
-        { expiresIn: '24h' }
-      );
-      res.json({ 
-        mensaje: 'Inicio de sesión exitoso', 
-        token, 
-        empleado: resultado.empleado 
-      });
-    } else {
-      res.status(400).json({ mensaje: resultado.error });
-    }
-  } catch (error) {
-    res.status(500).json({ mensaje: 'Error en el servidor', error: error.message });
+  const resultado = await registro.loginEmpleado(req, res);
+  if (resultado.error) {
+    return res.status(400).json({ mensaje: resultado.error });
   }
+  const token = jwt.sign({ id_empleado: resultado.empleado.id_empleado }, SECRET_KEY, { expiresIn: '1h' });
+  return res.status(200).json({
+    mensaje: 'Inicio de sesión exitoso',
+    token
+  });
 });
 
-// Rutas para el registro de usuarios y empleados
-app.post('/cregistrarse', upload.single('foto_usuario'), apis2.registrarseUsuario);
-app.post('/registerEmployee', upload.single('foto_empleado'), apis2.registrarseEmpleado);
+app.post('/cregistrarse', upload.single('foto_usuario'), registro.registrarseUsuario);
+app.post('/registerEmployee', upload.single('foto_empleado'), registro.registrarseEmpleado);
 
 // --------------------------------------------- Iniciar el servidor ---------------------------------------------
 app.listen(port, () => {

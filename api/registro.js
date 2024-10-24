@@ -103,7 +103,7 @@ const registrarseEmpleado = async (request, response) => {
   }
 };
 
-// //--------------------------------------------------------------Registro de Usuario //--------------------------------------------------------------
+//--------------------------------------------------------------Registro de Usuario--------------------------------------------------------------
 const registrarseUsuario = async (request, response) => {
   console.log('Iniciando registro de usuario');
   const { nombre_usuario, apellido1_usuario, apellido2_usuario, correo_usuario, contrasena_usuario } = request.body;

@@ -66,112 +66,123 @@
         }
         .main-content {
             padding: 2rem;
-        }
+        }      
+
         .button-container {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-top: 2rem;
+            gap: 20px;
         }
-        .action-button {
-            background-color: #e4640e;
+        .button {
+            background-color: #e27611;
             color: white;
+            padding: 15px;
             border: none;
-            padding: 1rem;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: all 0.3s ease;
+            border-radius: 8px;
             text-align: center;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
         }
-        .action-button:hover {
-            background-color: #cf5d0d;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        .button:hover {
+            background-color: #d0660e;
         }
     </style>
 </head>
 <body>
     <header class="header">
-        <h1 id="employee-name">Escritorio de: </h1>
-        <div class="user-menu">
-            <img src="/api/placeholder/40/40" alt="Foto de perfil" class="user-photo" id="user-photo">
-            <div class="dropdown-menu" id="dropdown-menu">
-                <a href="#perfil">Ver Perfil</a>
-                <a href="#configuracion">Configuración</a>
-                <a href="#" id="logout">Cerrar Sesión</a>
-            </div>
+    <h1>Escritorio del Empleado</h1>
+    <div class="user-menu">
+        <img id="employeePhoto" src="/api/placeholder/40/40" alt="Foto de perfil" class="user-photo" onclick="toggleDropdown()">
+        <div class="dropdown-menu" id="dropdownMenu">
+            <a href="#" onclick="cerrarSesion()">Cerrar Sesión</a>
         </div>
+    </div>
     </header>
-    
+
     <main class="main-content">
-        <div class="button-container">
-            <a href="#registrar-datos" class="action-button">Registrar Datos</a>
-            <a href="#ver-informes" class="action-button">Ver Informes</a>
-            <a href="#gestionar-usuarios" class="action-button">Gestionar Usuarios</a>
-            <a href="#configurar-sistema" class="action-button">Configurar Sistema</a>
-        </div>
+    <h2>Bienvenido, <span id="employeeName">Cargando...</span></h2>
+    <div class="button-container">
+        <button class="button">Gestión de Proyectos</button>
+        <button class="button">Revisión de Reportes</button>
+        <button class="button">Comunicación Interna</button>
+        <button class="button">Documentación</button>
+    </div>
     </main>
 
     <script>
-        document.addEventListener('DOMContentLoaded', verificarAutenticacion);  
-
         document.addEventListener('DOMContentLoaded', function() {
-            const userPhoto = document.getElementById('user-photo');
-            const dropdownMenu = document.getElementById('dropdown-menu');
-            const logoutButton = document.getElementById('logout');
-            const employeeName = document.getElementById('employee-name');
+            verificarAutenticacion();
+            cargarDatosEmpleado();
+        });
 
-            // Obtener el nombre del empleado del localStorage o de donde se haya guardado
-            const name = localStorage.getItem('employeeName') || 'Empleado';
-            employeeName.textContent += name;
+        function toggleDropdown() {
+            const dropdown = document.getElementById('dropdownMenu');
+            dropdown.classList.toggle('active');
+        }
 
-            userPhoto.addEventListener('click', function() {
-                dropdownMenu.classList.toggle('active');
-            });
-
-            // Cerrar el menú si se hace clic fuera de él
-            document.addEventListener('click', function(event) {
-                if (!userPhoto.contains(event.target) && !dropdownMenu.contains(event.target)) {
-                    dropdownMenu.classList.remove('active');
+        function cargarDatosEmpleado() {
+            const employeeData = JSON.parse(localStorage.getItem('employeeData'));
+            if (employeeData) {
+                document.getElementById('employeeName').textContent = 
+                    `${employeeData.nombre_empleado} ${employeeData.apellido1_empleado}`;
+                if (employeeData.foto_empleado) {
+                    document.getElementById('employeePhoto').src = 
+                        `data:image/jpeg;base64,${employeeData.foto_empleado}`;
                 }
-            });
-
-            logoutButton.addEventListener('click', function(e) {
-                e.preventDefault();
-                // Aquí iría la lógica para cerrar sesión
-                localStorage.removeItem('token');
-                localStorage.removeItem('employeeName');
-                window.location.href = '/login';
-            });
-
-            // Verificar el token al cargar la página
-            const token = localStorage.getItem('token');
-            if (!token) {
-                window.location.href = '/login';
             }
-            
-            fetch('/EscritorioEmpleado', {
+        }
+
+        function verificarAutenticacion() {
+            const token = localStorage.getItem('token');
+            const userType = localStorage.getItem('userType');
+
+            if (!token || userType !== 'empleado') {
+                window.location.href = '/login';
+                return;
+            }
+
+            fetch('/verificar-token', {
                 method: 'GET',
                 headers: {
-                    'Authorization': localStorage.getItem('token'), // Enviar el token
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
                 }
             })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Acceso permitido:', data);
-                // Maneja la respuesta exitosa
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Token inválido');
+                }
+                return response.json();
             })
-            .catch(error => {
-                console.error('Error:', error);
-                // Mostrar mensaje de error o redirigir si el token no es válido
+            .catch((error) => {
+                console.error('Error de autenticación:', error);
+                localStorage.removeItem('token');
+                localStorage.removeItem('userType');
+                localStorage.removeItem('employeeData');
+                window.location.href = '/login';
             });
+        }
 
+        function cerrarSesion() {
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: "¿Deseas cerrar la sesión?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#e27611',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Sí, cerrar sesión',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('userType');
+                    localStorage.removeItem('employeeData');
+                    window.location.href = '/login';
+                }
             });
+        }
     </script>
 </body>
 </html>
