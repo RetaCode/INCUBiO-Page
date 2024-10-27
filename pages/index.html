@@ -6,6 +6,55 @@
     <title>INCUBiO</title>
     <link rel="stylesheet" href="../static/css/index.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
+    <style>
+        /* Estilos para el avatar circular */
+        .team-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5em;
+            justify-content: center;
+        }
+        .team-member {
+            text-align: center;
+            width: 150px;
+        }
+        .avatar {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 10px;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f4f1ea;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        /* Animación de hover para los avatares de los integrantes */
+        .team-member .avatar {
+            transition: transform 0.3s ease;
+        }
+
+        .team-member .avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Animación para los elementos en la sección "Más sobre nosotros" */
+        .info-item {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .info-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+    </style>
 </head>
 <body>
     <header id="main-header">
@@ -23,7 +72,6 @@
     <main>
         <section id="inicio" class="hero">
             <img src="../static/imgs/fondo1.png" alt="Imagen de inicio">
-            
         </section>
 
         <section id="que-es" class="content-section">
@@ -34,6 +82,7 @@
                         <img src="../static/imgs/Germinadora.jpeg" alt="Imagen descriptiva">
                     </div>
                     <div class="text-container">
+                       <p></p>
                         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat nisl ut dapibus.</p>
                     </div>
                 </div>
@@ -72,41 +121,47 @@
                 <h2>Quiénes somos</h2>
                 <p>Somos un equipo diverso y apasionado, comprometido con la excelencia y la innovación. Cada miembro aporta habilidades únicas y experiencias valiosas a nuestro equipo.</p>
                 <div class="team-grid">
+                    <!-- Miembro del equipo Ariel Campos -->
                     <div class="team-member">
                         <div class="avatar">
-                            <i class="fas fa-user"></i>
+                            <img src="../static/imgs/Arielca.png" alt="Ariel Campos">
                         </div>
-                        <h3>Ariel Campos    (DG) </h3>
+                        <h3>Ariel Campos (DG)</h3>
                     </div>
+                    <!-- Miembro del equipo Esteban Retana -->
                     <div class="team-member">
                         <div class="avatar">
-                            <i class="fas fa-user"></i>
+                            <img src="../static/imgs/Teban.png" alt="Esteban Retana">
                         </div>
                         <h3>Esteban Retana (DW)</h3>
                     </div>
+                    <!-- Miembro del equipo Daniela Navarro -->
                     <div class="team-member">
                         <div class="avatar">
-                            <i class="fas fa-user"></i>
+                            <img src="../static/imgs/Dani.png" alt="Daniela Navarro">
                         </div>
                         <h3>Daniela Navarro (MP)</h3>
                     </div>
+                    <!-- Miembro del equipo Luis Ureña -->
                     <div class="team-member">
                         <div class="avatar">
-                            <i class="fas fa-user"></i>
+                            <img src="../static/imgs/Mima.png" alt="Luis Ureña">
                         </div>
-                        <h3>Luis Ureña      (MP)</h3>
+                        <h3>Luis Ureña (MP)</h3>
                     </div>
+                    <!-- Miembro del equipo Abat Ocampo -->
                     <div class="team-member">
                         <div class="avatar">
-                            <i class="fas fa-user"></i>
+                            <img src="../static/imgs/Abad.png" alt="Abat Ocampo">
                         </div>
-                        <h3>Abat Ocampo   (MP)</h3>
+                        <h3>Abat Ocampo (MP)</h3>
                     </div>
+                    <!-- Miembro del equipo Nicole Valverde -->
                     <div class="team-member">
                         <div class="avatar">
-                            <i class="fas fa-user"></i>
+                            <img src="../static/imgs/Niky.png" alt="Nicole Valverde">
                         </div>
-                        <h3>Nicole Valverde   (MP)</h3>
+                        <h3>Nicole Valverde (MP)</h3>
                     </div>
                 </div>
             </div>
@@ -141,9 +196,8 @@
 
     <footer>
         <div class="container">
-            <p>&copy; 2024 Mi Empresa. Todos los derechos reservados.</p>
+            <p>&copy; 2024 INCUBiO. Todos los derechos reservados.</p>
             <div class="social-links">
-                
                 <a href="https://www.instagram.com/incubio.cr?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="><i class="fab fa-instagram"></i></a>
                 <a href="#"><i class="fab fa-linkedin"></i></a>
             </div>

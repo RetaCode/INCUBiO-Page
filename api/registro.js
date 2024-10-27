@@ -1,17 +1,11 @@
 const Pool = require('pg').Pool;
 const bcrypt = require('bcrypt');
 
-const pool = new Pool({
-  host: "localhost",
-  user: "Soporte",
-  password: "re2014416",
-  database: "INCUBiO",
-  port: 5432,
-});
+const pool = require('../db/db.config');
 
 const saltRounds = 10;
 
-//--------------------------------------------------------------Inicio de sesión Usuario--------------------------------------------------------------
+//--------------------------------------------------------------Inicio de sesión Usuario----------------------------------------------------------
 const loginUsuario = async (request, response) => {
   const { correo_usuario, contrasena_usuario } = request.body;
   console.log('Intentando login para usuario:', correo_usuario);
@@ -43,7 +37,7 @@ const loginUsuario = async (request, response) => {
   }
 };
 
-//--------------------------------------------------------------Inicio de sesión Empleado--------------------------------------------------------------
+//--------------------------------------------------------------Inicio de sesión Empleado---------------------------------------------------------
 const loginEmpleado = async (request, response) => {
   const { correo_empleado, contrasena_empleado } = request.body;
   console.log('Intentando login para empleado:', correo_empleado);
@@ -103,7 +97,7 @@ const registrarseEmpleado = async (request, response) => {
   }
 };
 
-//--------------------------------------------------------------Registro de Usuario--------------------------------------------------------------
+//--------------------------------------------------------------Registro de Usuario---------------------------------------------------------------
 const registrarseUsuario = async (request, response) => {
   console.log('Iniciando registro de usuario');
   const { nombre_usuario, apellido1_usuario, apellido2_usuario, correo_usuario, contrasena_usuario } = request.body;
@@ -137,9 +131,55 @@ const registrarseUsuario = async (request, response) => {
   }
 };
 
+const registrarGerminadora = async (req, res) => {
+  const { descripcion, color = 'naranja', version } = req.body;
+  const codigo = `G-${Date.now().toString(36).toUpperCase()}`; // Genera un código único
+
+  try {
+      const newGerminadora = await pool.query(
+          'INSERT INTO germinadora (codigo, descripcion_germinadora, color, version) VALUES ($1, $2, $3, $4) RETURNING *',
+          [codigo, descripcion, color, version]
+      );
+      res.status(201).json(newGerminadora.rows[0]);
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Error al guardar la germinadora' });
+  }
+};
+
+//--------------------------------------------------------------Registro de Semilla---------------------------------------------------------------
+const registrarSemilla = async (request, response) => {
+  console.log('Iniciando registro de semilla');
+  const { nombre_semilla, humedad_semilla, temperatura_semilla, descripcion_semilla } = request.body;
+  let foto_semilla = null;
+
+  console.log('Datos de semilla recibidos:', { nombre_semilla, humedad_semilla, temperatura_semilla, descripcion_semilla });
+
+  if (request.file) {
+    foto_semilla = request.file.buffer.toString('base64'); // Convertir imagen a Base64
+    console.log('Foto de semilla recibida y convertida a Base64');
+  }
+
+  try {
+    const query = "INSERT INTO semilla (nombre_semilla, foto_semilla, humedad_semilla, temperatura_semilla, descripcion_semilla) VALUES ($1, $2, $3, $4, $5) RETURNING *";
+    const values = [nombre_semilla, foto_semilla, humedad_semilla, temperatura_semilla, descripcion_semilla];
+    
+    console.log('Ejecutando query de inserción de semilla');
+    const results = await pool.query(query, values);
+    console.log('Semilla registrada exitosamente');
+    response.status(201).json({ mensaje: 'Semilla registrada exitosamente', semilla: results.rows[0] });
+  } catch (error) {
+    console.error('Error al registrar semilla:', error);
+    response.status(400).json({ mensaje: 'No se pudo registrar la semilla', error: error.message });
+  }
+};
+
+
 module.exports = {
   loginUsuario,
   loginEmpleado,
   registrarseEmpleado,
-  registrarseUsuario
+  registrarseUsuario,
+  registrarSemilla,
+  registrarGerminadora
 };

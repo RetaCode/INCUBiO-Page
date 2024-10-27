@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Semilla</title>
+    <style>
+        /* Estilo global */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            background: url('../static/imgs/hortalizas.jpg') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* Contenedor principal */
+        .main {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 450px;
+            box-sizing: border-box;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        h1 {
+            color: #e27611;
+            margin-bottom: 20px;
+        }
+
+        h3 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: bold;
+            text-align: left;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+            background-color: #f9f9f9;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="file"] {
+            padding: 5px;
+            font-size: 16px;
+            background-color: #f9f9f9;
+        }
+
+        input:focus, textarea:focus {
+            border-color: #e27611;
+            outline: none;
+        }
+
+        /* Personalización del botón de subir archivo */
+        .custom-file-upload {
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .custom-file-label {
+            display: inline-block;
+            padding: 12px;
+            background-color: #e4640e;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            width: 100%;
+            transition: background-color 0.3s ease;
+        }
+
+        .custom-file-label:hover {
+            background-color: #cf5d0d;
+        }
+
+        .custom-file-upload input[type="file"] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        /* Vista previa de la imagen */
+        #image-preview-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        #image-preview {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-top: 10px;
+            display: block; /* Se mostrará solo cuando haya una imagen */
+        }
+
+        /* Botón de envío */
+        button {
+            background-color: #e4640e;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #cf5d0d;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        a {
+            color: #e27611;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .wrap {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        /* Adaptabilidad para móviles */
+        @media (max-width: 600px) {
+            .main {
+                padding: 20px;
+                width: 90%;
+            }
+
+            button {
+                font-size: 14px;
+            }
+
+            input {
+                font-size: 14px;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <div class="main">
+        <h1>Registro de Semilla</h1>
+        <h3>Digite los datos de la semilla</h3>
+        <form id="registroSemilla" enctype="multipart/form-data" onsubmit="return validarFormulario(event)">
+            <!-- Campos de texto -->
+            <label for="nombre_semilla">Nombre de la semilla</label>
+            <input type="text" id="nombre_semilla" name="nombre_semilla" placeholder="Digite el nombre de la semilla" required>
+
+            <!-- Campos numéricos -->
+            <label for="humedad_semilla">Humedad (%)</label>
+            <input type="number" id="humedad_semilla" name="humedad_semilla" min="0" max="100" placeholder="Digite el nivel de humedad" required>
+
+            <label for="temperatura_semilla">Temperatura (°C)</label>
+            <input type="number" id="temperatura_semilla" name="temperatura_semilla" placeholder="Digite la temperatura ideal" required>
+
+            <!-- Campo de descripción -->
+            <label for="descripcion_semilla">Descripción</label>
+            <textarea id="descripcion_semilla" name="descripcion_semilla" maxlength="250" placeholder="Escriba una breve descripción" required></textarea>
+
+            <!-- Campo de foto -->
+            <label for="foto_semilla">Foto</label>
+            <div class="custom-file-upload">
+                <label for="foto_semilla" class="custom-file-label">Seleccionar foto</label>
+                <input type="file" id="foto_semilla" name="foto_semilla" accept="image/*" onchange="previewImage(event)" required>
+            </div>
+
+            <div id="image-preview-container">
+                <img id="image-preview" style="display: none;" alt="Vista previa de la imagen" />
+            </div>
+
+            <div class="wrap">
+                <button type="submit">Registrar Semilla</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function validarFormulario(event) {
+            event.preventDefault();
+
+            const nombre = document.getElementById('nombre_semilla').value;
+            const humedad = document.getElementById('humedad_semilla').value;
+            const temperatura = document.getElementById('temperatura_semilla').value;
+            const descripcion = document.getElementById('descripcion_semilla').value;
+            const foto = document.getElementById('foto_semilla').value;
+
+            if (!nombre || !humedad || !temperatura || !descripcion || !foto) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Campos incompletos',
+                    text: 'Por favor complete todos los campos del formulario.',
+                });
+                return false;
+            }
+
+            confirmarRegistro();
+            return false;
+        }
+
+        function confirmarRegistro() {
+            Swal.fire({
+                title: '¿Deseas guardar?',
+                text: "Estás a punto de registrar una semilla.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, registrar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    registrar();
+                }
+            });
+        }
+
+        function registrar() {
+            const formData = new FormData(document.getElementById('registroSemilla'));
+
+            fetch("/cregistrarsemilla", {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error en el registro');
+                }
+                return response.json();
+            })
+            .then(data => {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Éxito',
+                    text: 'Registro de semilla completado',
+                }).then(() => {
+                    window.location.reload();
+                });
+            })
+            .catch(error => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'No se pudo registrar la semilla: ' + error.message,
+                });
+            });
+        }
+
+        function previewImage(event) {
+            const imagePreview = document.getElementById('image-preview');
+            const file = event.target.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function() {
+                imagePreview.src = reader.result;
+                imagePreview.style.display = 'block';
+            };
+
+            if (file) {
+                reader.readAsDataURL(file);
+            }
+        }
+    </script>
+</body>
+</html>

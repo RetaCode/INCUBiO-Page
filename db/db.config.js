@@ -1,13 +1,16 @@
+// db/db.config.js
+const { Pool } = require('pg');
+
+const pool = new Pool({
+    user: "Soporte",
+    host: "localhost",
+    database: "INCUBiO",
+    password: "re2014416",
+    port: 5432, // Cambia si es necesario
+});
+
+// Exporta el pool para poder usarlo en otros archivos
 module.exports = {
-    HOST: "localhost",
-    USER: "Soporte",
-    PASSWORD: "re2014416",
-    DB: "INCUBiO",
-    dialect: "postgres",
-    pool: {
-      max: 5,
-      min: 0,
-      acquire: 30000,
-      idle: 10000
-    }
-  };
+    query: (text, params) => pool.query(text, params),
+    pool,
+};

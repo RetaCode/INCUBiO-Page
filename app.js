@@ -3,7 +3,11 @@ const morgan = require("morgan");
 const multer = require('multer');
 const path = require('path');
 const jwt = require('jsonwebtoken');
+
 const registro = require('./api/registro'); // Importa las funciones del archivo registro.js
+const seleccionar = require('./api/seleccionar'); // Importar las funciones del archivo seleccionar.js
+const cambios = require('./api/cambios'); // Importar las funciones del archivo cambios.js
+
 const app = express();
 const port = 3000;
 
@@ -71,6 +75,19 @@ app.get('/verificar-token', verificarToken, (req, res) => {
   res.send({ mensaje: 'Token válido', usuario: req.usuario });
 });
 
+app.get("/formSemilla", (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'formSemilla.html'));
+});
+
+app.get("/mostrarHortalizas", (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'hortalizas.html'));
+});
+
+app.get("/germinadoras", (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'germinadoras.html'));
+});
+
+
 app.get("/EscritorioEmpleado", verificarToken, (req, res) => {
   res.sendFile(path.join(__dirname, 'pages', 'escritorioEmpleado.html'));
 });
@@ -79,7 +96,7 @@ app.get("/registroEmpleado", verificarToken, (req, res) => {
   res.sendFile(path.join(__dirname, 'pages', 'FormEmpleado.html'));
 });
 
-app.get("/EscritorioUsuario", verificarToken, (req, res) => {
+app.get("/EscritorioUsuario", (req, res) => {
   res.sendFile(path.join(__dirname, 'pages', 'escritorioUsuario.html'));
 });
 
@@ -108,10 +125,25 @@ app.post('/servicio-login-empleado', async (req, res) => {
   });
 });
 
+
+// --------------------------------------------- Registros ---------------------------------------------
 app.post('/cregistrarse', upload.single('foto_usuario'), registro.registrarseUsuario);
 app.post('/registerEmployee', upload.single('foto_empleado'), registro.registrarseEmpleado);
+app.post('/cregistrarsemilla', upload.single('foto_semilla'), registro.registrarSemilla);
+app.post('/cregistrargerminadora', registro.registrarGerminadora);
+
+// --------------------------------------------- Selecciones ---------------------------------------------
+app.get('/obtenerGerminadoras', seleccionar.obtenerGerminadoras);
+app.get('/obtenerGerminadora/:codigo', seleccionar.obtenerGerminadora);
+app.get('/cargarSemillas', seleccionar.cargarSemillas);
+
+// --------------------------------------------- Actualizar / Eliminar ---------------------------------------------
+app.put('/actualizarGerminadora/:codigo', cambios.actualizarGerminadora);
+app.delete('/eliminarGerminadora/:codigo', cambios.eliminarGerminadora);
+
 
 // --------------------------------------------- Iniciar el servidor ---------------------------------------------
+const PORT = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
