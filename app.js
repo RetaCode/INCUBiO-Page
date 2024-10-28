@@ -3,6 +3,7 @@ const morgan = require("morgan");
 const multer = require('multer');
 const path = require('path');
 const jwt = require('jsonwebtoken');
+const bodyParser = require('body-parser');
 
 const registro = require('./api/registro'); // Importa las funciones del archivo registro.js
 const seleccionar = require('./api/seleccionar'); // Importar las funciones del archivo seleccionar.js
@@ -11,12 +12,28 @@ const cambios = require('./api/cambios'); // Importar las funciones del archivo 
 const app = express();
 const port = 3000;
 
+// Configuración de body-parser con límite de tamaño
+app.use(bodyParser.json({ limit: '10mb' }));
+app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
+
 // --------------------------------------------- Configuración de multer para manejar la carga de archivos ---------------------------------------------
 const storage = multer.memoryStorage();
-const upload = multer({
-  storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 } // 5 MB limit
+const upload = multer({ 
+    storage: storage,
+    limits: {
+        fileSize: 5 * 1024 * 1024 // límite de 5MB
+    },
+    fileFilter: (req, file, cb) => {
+        // Verificar el tipo de archivo
+        if (file.mimetype.startsWith('image/')) {
+            cb(null, true);
+        } else {
+            cb(new Error('Solo se permiten archivos de imagen'));
+        }
+    }
 });
+
+
 
 // --------------------------------------------- Clave secreta para firmar los tokens JWT ---------------------------------------------
 const SECRET_KEY = '1Ncu310'; 
@@ -26,8 +43,6 @@ const SECRET_KEY = '1Ncu310';
 function verificarToken(req, res, next) {
     const token = req.headers['authorization']; // Debes enviar el token en el encabezado "authorization"
     
-
-
     if (!token) {
         return res.status(403).json({ mensaje: 'No se proporcionó un token' });
     }
@@ -87,17 +102,29 @@ app.get("/germinadoras", (req, res) => {
   res.sendFile(path.join(__dirname, 'pages', 'germinadoras.html'));
 });
 
+app.get("/estadisticas", (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'estadisticas.html'));
+});
 
-app.get("/EscritorioEmpleado", verificarToken, (req, res) => {
+
+app.get("/EscritorioEmpleado", (req, res) => {
   res.sendFile(path.join(__dirname, 'pages', 'escritorioEmpleado.html'));
 });
 
-app.get("/registroEmpleado", verificarToken, (req, res) => {
+app.get("/registroEmpleado", (req, res) => {
   res.sendFile(path.join(__dirname, 'pages', 'FormEmpleado.html'));
 });
 
 app.get("/EscritorioUsuario", (req, res) => {
   res.sendFile(path.join(__dirname, 'pages', 'escritorioUsuario.html'));
+});
+
+app.get("/usuarios", (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'usuarios.html'));
+});
+
+app.get("/empleados", (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'empleados.html'));
 });
 
 // --------------------------------------------- Rutas de inicio de sesión y registro ---------------------------------------------
@@ -136,11 +163,14 @@ app.post('/cregistrargerminadora', registro.registrarGerminadora);
 app.get('/obtenerGerminadoras', seleccionar.obtenerGerminadoras);
 app.get('/obtenerGerminadora/:codigo', seleccionar.obtenerGerminadora);
 app.get('/cargarSemillas', seleccionar.cargarSemillas);
+app.get('/obtenerUsuarios', seleccionar.obtenerUsuarios);
+app.get('/obtenerUsuario/:id', seleccionar.obtenerUsuarioid);
 
 // --------------------------------------------- Actualizar / Eliminar ---------------------------------------------
 app.put('/actualizarGerminadora/:codigo', cambios.actualizarGerminadora);
 app.delete('/eliminarGerminadora/:codigo', cambios.eliminarGerminadora);
-
+app.put('/actualizarUsuario/:id', upload.single('foto_usuario'), cambios.actualizarUsuario);
+app.delete('/eliminarUsuario/:id', cambios.eliminarUsuario);
 
 // --------------------------------------------- Iniciar el servidor ---------------------------------------------
 const PORT = process.env.PORT || 3000;

@@ -25,14 +25,14 @@ async function cargarSemillas(req, res) {
 
 const obtenerGerminadoras = async (req, res) => {
     try {
-        const result = await pool.query('SELECT * FROM germinadora');
-        res.json(result.rows);
+      const result = await pool.query('SELECT * FROM germinadora');
+      res.json(result.rows);
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Error al obtener germinadoras' });
+      console.error(error);
+      res.status(500).json({ error: 'Error al obtener germinadoras' });
     }
 };
-
+  
 const obtenerGerminadora = async (req, res) => {
     const { codigo } = req.params;
     try {
@@ -44,8 +44,47 @@ const obtenerGerminadora = async (req, res) => {
     }
 };
 
+const obtenerUsuarios = async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM usuario');
+        
+        // Transformar los datos para incluir el formato base64 correcto
+        const usuarios = result.rows.map(usuario => ({
+            ...usuario,
+            foto_usuario: usuario.foto_usuario ? `data:image/jpeg;base64,${usuario.foto_usuario}` : null
+        }));
+        
+        res.json(usuarios);
+    } catch (error) {
+        console.error('Error al obtener usuarios:', error);
+        res.status(500).send('Error al obtener usuarios');
+    }
+};
+
+const obtenerUsuarioid = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const result = await pool.query('SELECT * FROM usuario WHERE id_usuario = $1', [id]);
+        if (result.rows.length) {
+            const usuario = {
+                ...result.rows[0],
+                foto_usuario: result.rows[0].foto_usuario ? 
+                    `data:image/jpeg;base64,${result.rows[0].foto_usuario}` : null
+            };
+            res.json(usuario);
+        } else {
+            res.status(404).send('Usuario no encontrado');
+        }
+    } catch (error) {
+        console.error('Error al obtener usuario:', error);
+        res.status(500).send('Error al obtener usuario');
+    }
+};
+
 module.exports = {
     cargarSemillas,
     obtenerGerminadoras,
     obtenerGerminadora,
+    obtenerUsuarios,
+    obtenerUsuarioid
 };

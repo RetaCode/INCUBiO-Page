@@ -104,18 +104,14 @@
 
     <main class="main-content">
         <section class="welcome-section">
-            <h1>Bienvenido a tu Escritorio</h1>
-            <p>Desde aquí podrás gestionar todas tus actividades.</p>
+            <h1>Bienvenido a tus INCUBiO's</h1>
+            <p>Desde aquí se mostraran</p>
         </section>
 
         <div class="menu-grid">
             <div class="menu-item">
                 <h3>Mi Perfil</h3>
                 <p>Actualiza tu información personal y preferencias</p>
-            </div>
-            <div class="menu-item">
-                <h3>Mis Proyectos</h3>
-                <p>Administra tus proyectos activos</p>
             </div>
             <div class="menu-item">
                 <h3>Mensajes</h3>
@@ -129,54 +125,54 @@
     </main>
 
     <script>
-        // Redirigiendo a la página protegida con el token
-        function cargarEscritorioUsuario() {
-            const token = localStorage.getItem('token');
-            console.log('Token:', token); // Esto te permitirá ver si el token está disponible
+        // // Redirigiendo a la página protegida con el token
+        // function cargarEscritorioUsuario() {
+        //     const token = localStorage.getItem('token');
+        //     console.log('Token:', token); // Esto te permitirá ver si el token está disponible
 
-            if (!token) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'No se encontró un token, por favor inicia sesión de nuevo',
-                });
-                window.location.href = '/login'; // Redirigir al login si no hay token
-            } else {
-                fetch('/EscritorioUsuario', {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}` // Enviar el token en el encabezado Authorization
-                    }
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Token no válido');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    // Manejar la respuesta de la página protegida
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Token inválido',
-                        text: 'Por favor inicia sesión de nuevo.',
-                    });
-                    window.location.href = '/login';
-                });
-            }
-        }
+        //     if (!token) {
+        //         Swal.fire({
+        //             icon: 'error',
+        //             title: 'Error',
+        //             text: 'No se encontró un token, por favor inicia sesión de nuevo',
+        //         });
+        //         window.location.href = '/login'; // Redirigir al login si no hay token
+        //     } else {
+        //         fetch('/EscritorioUsuario', {
+        //             method: 'GET',
+        //             headers: {
+        //                 'Authorization': `Bearer ${token}` // Enviar el token en el encabezado Authorization
+        //             }
+        //         })
+        //         .then(response => {
+        //             if (!response.ok) {
+        //                 throw new Error('Token no válido');
+        //             }
+        //             return response.json();
+        //         })
+        //         .then(data => {
+        //             // Manejar la respuesta de la página protegida
+        //         })
+        //         .catch(error => {
+        //             console.error('Error:', error);
+        //             Swal.fire({
+        //                 icon: 'error',
+        //                 title: 'Token inválido',
+        //                 text: 'Por favor inicia sesión de nuevo.',
+        //             });
+        //             window.location.href = '/login';
+        //         });
+        //     }
+        // }
 
-        window.onload = cargarEscritorioUsuario;
+        // window.onload = cargarEscritorioUsuario;
 
 
         // Verificar autenticación al cargar la página
-        document.addEventListener('DOMContentLoaded', function() {
-            verificarAutenticacion();
-            cargarDatosUsuario();
-        });
+        // document.addEventListener('DOMContentLoaded', function() {
+        //     verificarAutenticacion();
+        //     cargarDatosUsuario();
+        // });
 
         function cargarDatosUsuario() {
             const userData = JSON.parse(localStorage.getItem('userData'));
@@ -191,37 +187,37 @@
             }
         }
 
-        function verificarAutenticacion() {
-            const token = localStorage.getItem('token');
-            const userType = localStorage.getItem('userType');
+        // function verificarAutenticacion() {
+        //     const token = localStorage.getItem('token');
+        //     const userType = localStorage.getItem('userType');
 
-            if (!token || userType !== 'usuario') {
-                window.location.href = '/login';
-                return;
-            }
+        //     if (!token || userType !== 'usuario') {
+        //         window.location.href = '/login';
+        //         return;
+        //     }
 
-            // Hacer la petición con el token en el header
-            fetch('/verificar-token', {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Token inválido');
-                }
-                return response.json();
-            })
-            .catch((error) => {
-                console.error('Error de autenticación:', error);
-                localStorage.removeItem('token');
-                localStorage.removeItem('userType');
-                localStorage.removeItem('userData');
-                window.location.href = '/login';
-            });
-        }
+        //     // Hacer la petición con el token en el header
+        //     fetch('/verificar-token', {
+        //         method: 'GET',
+        //         headers: {
+        //             'Authorization': `Bearer ${token}`,
+        //             'Content-Type': 'application/json'
+        //         }
+        //     })
+        //     .then(response => {
+        //         if (!response.ok) {
+        //             throw new Error('Token inválido');
+        //         }
+        //         return response.json();
+        //     })
+        //     .catch((error) => {
+        //         console.error('Error de autenticación:', error);
+        //         localStorage.removeItem('token');
+        //         localStorage.removeItem('userType');
+        //         localStorage.removeItem('userData');
+        //         window.location.href = '/login';
+        //     });
+        // }
 
         function cerrarSesion() {
             Swal.fire({

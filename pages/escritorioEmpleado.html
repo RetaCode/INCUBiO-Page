@@ -133,36 +133,36 @@
             }
         }
 
-        function verificarAutenticacion() {
-            const token = localStorage.getItem('token');
-            const userType = localStorage.getItem('userType');
+        // function verificarAutenticacion() {
+        //     const token = localStorage.getItem('token');
+        //     const userType = localStorage.getItem('userType');
 
-            if (!token || userType !== 'empleado') {
-                window.location.href = '/login';
-                return;
-            }
+        //     if (!token || userType !== 'empleado') {
+        //         window.location.href = '/login';
+        //         return;
+        //     }
 
-            fetch('/verificar-token', {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Token inválido');
-                }
-                return response.json();
-            })
-            .catch((error) => {
-                console.error('Error de autenticación:', error);
-                localStorage.removeItem('token');
-                localStorage.removeItem('userType');
-                localStorage.removeItem('employeeData');
-                window.location.href = '/login';
-            });
-        }
+        //     fetch('/verificar-token', {
+        //         method: 'GET',
+        //         headers: {
+        //             'Authorization': `Bearer ${token}`,
+        //             'Content-Type': 'application/json'
+        //         }
+        //     })
+        //     .then(response => {
+        //         if (!response.ok) {
+        //             throw new Error('Token inválido');
+        //         }
+        //         return response.json();
+        //     })
+        //     .catch((error) => {
+        //         console.error('Error de autenticación:', error);
+        //         localStorage.removeItem('token');
+        //         localStorage.removeItem('userType');
+        //         localStorage.removeItem('employeeData');
+        //         window.location.href = '/login';
+        //     });
+        // }
 
         function cerrarSesion() {
             Swal.fire({

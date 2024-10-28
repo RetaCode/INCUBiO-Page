@@ -294,8 +294,8 @@
                 <input type="text" id="descripcion" name="descripcion" required>
             </div>
             <div class="form-group">
-                <label for="color">Color (Predeterminado: Naranja):</label>
-                <input type="text" id="color" name="color" value="naranja" disabled>
+                <label for="color">Color:</label>
+                <input type="color" id="color" name="color" value="#FFA500"> <!-- El valor predeterminado es naranja -->
             </div>
             <div class="form-group">
                 <label for="version">Versión:</label>
@@ -364,13 +364,13 @@
                 const germinadoras = await response.json();
                 const tableBody = document.getElementById('germinadorasTableBody');
                 tableBody.innerHTML = '';
-
+    
                 germinadoras.forEach(germinadora => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${germinadora.codigo}</td>
                         <td>${germinadora.descripcion_germinadora}</td>
-                        <td>${germinadora.color}</td>
+                        <td style="background-color: ${germinadora.color}; color: ${getTextColor(germinadora.color)};">${germinadora.color}</td>
                         <td>${germinadora.version}</td>
                         <td>
                             <button class="btn-edit" onclick="editarGerminadora('${germinadora.codigo}')">Editar</button>
@@ -383,18 +383,27 @@
                 console.error('Error al cargar germinadoras:', error);
             }
         }
-
+    
+        // Función para determinar el color del texto según el fondo
+        function getTextColor(hexColor) {
+            const r = parseInt(hexColor.substr(1, 2), 16);
+            const g = parseInt(hexColor.substr(3, 2), 16);
+            const b = parseInt(hexColor.substr(5, 2), 16);
+            const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+            return brightness > 125 ? '#000000' : '#FFFFFF';
+        }
+    
         // Función para registrar una nueva germinadora
         document.getElementById('registerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(e.target);
-
+    
             const data = {
                 descripcion: formData.get('descripcion'),
-                color: formData.get('color') || 'naranja',
+                color: formData.get('color') || '#FFA500', // Naranja predeterminado en hexadecimal
                 version: formData.get('version'),
             };
-
+    
             Swal.fire({
                 title: '¿Desea guardar esta germinadora?',
                 icon: 'question',
@@ -423,7 +432,7 @@
                 }
             });
         });
-
+    
         // Función para eliminar una germinadora
         async function eliminarGerminadora(codigo) {
             Swal.fire({
@@ -452,12 +461,12 @@
                 }
             });
         }
-
+    
         // Función para abrir el modal de edición con los datos de la germinadora seleccionada
         function editarGerminadora(codigo) {
             document.getElementById('editModal').style.display = 'block';
             const form = document.getElementById('editForm');
-
+    
             fetch(`/obtenerGerminadora/${codigo}`)
                 .then(response => response.json())
                 .then(germinadora => {
@@ -468,12 +477,12 @@
                 })
                 .catch(error => console.error('Error al obtener germinadora:', error));
         }
-
+    
         // Cerrar el modal de edición
         function closeModal() {
             document.getElementById('editModal').style.display = 'none';
         }
-
+    
         // Función para guardar los cambios de una germinadora editada
         document.getElementById('editForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -484,7 +493,7 @@
                 color: form.elements['editColor'].value,
                 version: form.elements['editVersion'].value,
             };
-
+    
             Swal.fire({
                 title: '¿Desea guardar los cambios?',
                 icon: 'question',
@@ -513,11 +522,10 @@
                 }
             });
         });
-
+    
         // Cargar las germinadoras al inicio
         cargarGerminadoras();
-
-
     </script>
+    
 </body>
 </html>
