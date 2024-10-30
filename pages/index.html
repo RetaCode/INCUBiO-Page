@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INCUBiO</title>
+    <link rel="stylesheet" href="../static/css/index.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
+    <style>
+        /* Estilos para el avatar circular */
+        .team-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5em;
+            justify-content: center;
+        }
+        .team-member {
+            text-align: center;
+            width: 150px;
+        }
+        .avatar {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 10px;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f4f1ea;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        /* Animación de hover para los avatares de los integrantes */
+        .team-member .avatar {
+            transition: transform 0.3s ease;
+        }
+
+        .team-member .avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Animación para los elementos en la sección "Más sobre nosotros" */
+        .info-item {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .info-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .texto{
+            padding-top: 30px;
+        }
+
+    </style>
+</head>
+<body>
+    <header id="main-header">
+        <div class="logo">
+            <a href="#inicio">
+                <img src="../static/imgs/Logo plano.png" alt="Logo de la empresa">
+            </a>
+        </div>
+        <div class="auth-buttons">
+            <a href="/login" class="btn btn-login"><i class="fas fa-sign-in-alt"></i>&nbsp Iniciar sesión</a>
+            <a href="/RegUser" class="btn btn-register"><i class="fas fa-user-plus"></i> &nbsp Registrarse</a>
+        </div>
+    </header>
+
+    <main>
+        <section id="inicio" class="hero">
+            <img src="../static/imgs/fondo1.png" alt="Imagen de inicio">
+        </section>
+
+        <section id="que-es" class="content-section">
+            <div class="container">
+                <h2>¿Qué es?</h2>
+                <div class="info-box">
+                    <div class="image-container">
+                        <img src="../static/imgs/Germinadora.jpeg" alt="Imagen descriptiva">
+                    </div>
+                    <div class="text-container">
+                       <p></p>
+                        <p class="texto">INCUBiO es una germinadora automatizada desarrollada para optimizar el crecimiento de hortalizas en Costa Rica, enfrentando el reto de aumentar su variedad y cantidad de manera eficiente. Este proyecto integra sensores de temperatura y humedad, permitiendo crear un microclima controlado ideal para cada tipo de semilla. La tecnología aplicada permite al usuario supervisar en tiempo real las condiciones de la germinadora y recibir una predicción del tiempo restante hasta que la semilla esté lista para trasplante. </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider"></div>
+
+        <section id="objetivos" class="content-section">
+            <div class="container">
+                <h2>Objetivos</h2>
+                <div class="objectives-grid">
+                    <div class="objective">
+                        <i class="fas fa-chart-line"></i>
+                        <h3>Optimización Agrícola</h3>
+                        <p>Crear una germinadora inteligente con ajustes automatizados de condiciones ambientales, que potencie la eficiencia y calidad en la producción de hortalizas.</p>
+                    </div>
+                    <div class="objective">
+                        <i class="fas fa-handshake"></i>
+                        <h3>Supervisión y Control</h3>
+                        <p>Implementar un sistema integral de monitoreo y control que facilite la observación y análisis del crecimiento de hortalizas, adaptando el entorno para cada semilla.</p>
+                    </div>
+                    <div class="objective">
+                        <i class="fas fa-lightbulb"></i>
+                        <h3>Desarrollo Tecnológico</h3>
+                        <p>Desarrollar, validar y mejorar continuamente la tecnología de la germinadora, optimizando su diseño y la página de monitoreo para un cultivo eficiente en ambientes controlados</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider"></div>
+
+        <section id="quienes-somos" class="content-section">
+            <div class="container">
+                <h2>¿Quiénes somos?</h2>
+                <p>Somos un equipo multidisciplinario apasionado por la innovación en la agricultura y comprometido con el desarrollo de soluciones tecnológicas que impulsen la eficiencia y sostenibilidad en el cultivo de hortalizas. Con una visión enfocada en mejorar la calidad de las cosechas en Costa Rica, hemos integrado conocimientos de ingeniería, diseño y tecnología para crear INCUBiO, una germinadora automatizada y controlada.</p>
+                <div class="team-grid">
+                    <!-- Miembro del equipo Ariel Campos -->
+                    <div class="team-member">
+                        <div class="avatar">
+                            <img src="../static/imgs/Arielca.png" alt="Ariel Campos">
+                        </div>
+                        <h3>Ariel Campos (DG)</h3>
+                    </div>
+                    <!-- Miembro del equipo Esteban Retana -->
+                    <div class="team-member">
+                        <div class="avatar">
+                            <img src="../static/imgs/Teban.png" alt="Esteban Retana">
+                        </div>
+                        <h3>Esteban Retana (DW)</h3>
+                    </div>
+                    <!-- Miembro del equipo Daniela Navarro -->
+                    <div class="team-member">
+                        <div class="avatar">
+                            <img src="../static/imgs/Dani.png" alt="Daniela Navarro">
+                        </div>
+                        <h3>Daniela Navarro (MP)</h3>
+                    </div>
+                    <!-- Miembro del equipo Luis Ureña -->
+                    <div class="team-member">
+                        <div class="avatar">
+                            <img src="../static/imgs/Mima.png" alt="Luis Ureña">
+                        </div>
+                        <h3>Luis Ureña   
+                            <h3>(MP)</h3></h3>
+                    </div>
+                    <!-- Miembro del equipo Abat Ocampo -->
+                    <div class="team-member">
+                        <div class="avatar">
+                            <img src="../static/imgs/Abad.png" alt="Abat Ocampo">
+                        </div>
+                        <h3>Abat Ocampo (MP)</h3>
+                    </div>
+                    <!-- Miembro del equipo Nicole Valverde -->
+                    <div class="team-member">
+                        <div class="avatar">
+                            <img src="../static/imgs/Niky.png" alt="Nicole Valverde">
+                        </div>
+                        <h3>Nicole Valverde (MP)</h3>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider"></div>
+
+        <section id="mas-sobre-nosotros" class="content-section">
+            <div class="container">
+                <h2>Más sobre nosotros</h2>
+
+                <br>
+                
+                <div class="info-grid">
+                    <div class="info-item">
+                        <img src="../static/imgs/Grupio.png " alt="Imagen 1">
+                        <h3>Nuestra Historia</h3>
+                        <p> El proyecto fue refinado a través de la fusión de dos iniciativas previas presentadas en la Expo STEAM 2023, lo que consolidó a INCUBiO como una solución robusta y automatizada.</p>
+                    </div>
+                    <div class="info-item">
+                        <img src="../static/imgs/Almacigos.png" alt="Imagen 2">
+                        <h3>Problematica</h3>
+                        <p>3 de cada 7 no llegan al etapa de la plantula resultando en un gran malgasto del tiempo a las personas que intentan el crecimiento de sus semillas.</p>
+                    </div>
+                    <div class="info-item">
+                        <img src="../static/imgs/render.jpeg" alt="Imagen 3">
+                        <h3>Desarrollo Tecnológico</h3>
+                        <p>Desarrollar, validar y mejorar continuamente la tecnología de la germinadora, optimizando su diseño y la página de monitoreo para un cultivo eficiente en ambientes controlados.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 INCUBiO. Todos los derechos reservados.</p>
+            <div class="social-links">
+                <a href="https://www.instagram.com/incubio.cr?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../static/scripts/index.js"></script>
+</body>
+</html>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escritorio del Empleado</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .header {
+            background-color: #e27611;
+            color: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .user-menu {
+            position: relative;
+        }
+        .user-photo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        .user-photo:hover {
+            transform: scale(1.1);
+        }
+        .dropdown-menu {
+            position: absolute;
+            right: 0;
+            top: 50px;
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: none;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .dropdown-menu.active {
+            display: block;
+            animation: slideDown 0.3s ease forwards;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .dropdown-menu a {
+            display: block;
+            padding: 10px 20px;
+            color: #333;
+            text-decoration: none;
+            transition: background-color 0.2s ease;
+        }
+        .dropdown-menu a:hover {
+            background-color: #f0f0f0;
+        }
+        .main-content {
+            padding: 2rem;
+        }      
+
+        .button-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .button {
+            background-color: #e27611;
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        .button:hover {
+            background-color: #d0660e;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+    <h1>Escritorio del Empleado</h1>
+    <div class="user-menu">
+        <img id="employeePhoto" src="/api/placeholder/40/40" alt="Foto de perfil" class="user-photo" onclick="toggleDropdown()">
+        <div class="dropdown-menu" id="dropdownMenu">
+            <a href="#" onclick="cerrarSesion()">Cerrar Sesión</a>
+        </div>
+    </div>
+    </header>
+
+    <main class="main-content">
+    <h2>Bienvenido, <span id="employeeName">Cargando...</span></h2>
+    <div class="button-container">
+        <button class="button">Gestión de Proyectos</button>
+        <button class="button">Revisión de Reportes</button>
+        <button class="button">Comunicación Interna</button>
+        <button class="button">Documentación</button>
+    </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            verificarAutenticacion();
+            cargarDatosEmpleado();
+        });
+
+        function toggleDropdown() {
+            const dropdown = document.getElementById('dropdownMenu');
+            dropdown.classList.toggle('active');
+        }
+
+        function cargarDatosEmpleado() {
+            const employeeData = JSON.parse(localStorage.getItem('employeeData'));
+            if (employeeData) {
+                document.getElementById('employeeName').textContent = 
+                    `${employeeData.nombre_empleado} ${employeeData.apellido1_empleado}`;
+                if (employeeData.foto_empleado) {
+                    document.getElementById('employeePhoto').src = 
+                        `data:image/jpeg;base64,${employeeData.foto_empleado}`;
+                }
+            }
+        }
+
+        // function verificarAutenticacion() {
+        //     const token = localStorage.getItem('token');
+        //     const userType = localStorage.getItem('userType');
+
+        //     if (!token || userType !== 'empleado') {
+        //         window.location.href = '/login';
+        //         return;
+        //     }
+
+        //     fetch('/verificar-token', {
+        //         method: 'GET',
+        //         headers: {
+        //             'Authorization': `Bearer ${token}`,
+        //             'Content-Type': 'application/json'
+        //         }
+        //     })
+        //     .then(response => {
+        //         if (!response.ok) {
+        //             throw new Error('Token inválido');
+        //         }
+        //         return response.json();
+        //     })
+        //     .catch((error) => {
+        //         console.error('Error de autenticación:', error);
+        //         localStorage.removeItem('token');
+        //         localStorage.removeItem('userType');
+        //         localStorage.removeItem('employeeData');
+        //         window.location.href = '/login';
+        //     });
+        // }
+
+        function cerrarSesion() {
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: "¿Deseas cerrar la sesión?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#e27611',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Sí, cerrar sesión',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('userType');
+                    localStorage.removeItem('employeeData');
+                    window.location.href = '/login';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Empleados</title>
+    <link rel="stylesheet" href="../static/css/formEmpleado.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
+    <!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Empleados</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --color-naranja: #e4640e;
+            --color-crema: #f9f9f9;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        #main-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .header-left {
+            margin-left: 20px;
+        }
+
+        .back-button {
+            font-size: 24px;
+            color: var(--color-naranja);
+            text-decoration: none;
+        }
+
+        .logo {
+            margin-right: 20px;
+        }
+
+        .logo img {
+            height: 40px;
+        }
+
+        .header-title {
+            flex-grow: 1;
+            text-align: center;
+            color: #333;
+            font-size: 1.2em;
+        }
+
+        @media (max-width: 600px) {
+            .header-title {
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header id="main-header">
+        <div class="header-left">
+            <a href="/EscritorioEmpleado" class="back-button" onclick="history.back()">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+        </div>
+        <div class="header-title">
+            <h2>Registro de Empleados</h2>
+        </div>
+        <div class="logo">
+            <a href="#inicio">
+                <img src="../static/imgs/Logo plano.png" alt="Logo de la empresa">
+            </a>
+        </div>
+    </header>
+    <div class="container">
+        <div class="form-container">
+            <form id="formEmpleado" enctype="multipart/form-data" onsubmit="return validarFormulario(event)">
+                <div class="form-group">
+                    <label for="nombre_empleado">Nombre</label>
+                    <input type="text" class="form-control" id="nombre_empleado" name="nombre_empleado" required>
+                </div>
+                <div class="form-group">
+                    <label for="apellido1_empleado">Primer Apellido</label>
+                    <input type="text" class="form-control" id="apellido1_empleado" name="apellido1_empleado" required>
+                </div>
+                <div class="form-group">
+                    <label for="apellido2_empleado">Segundo Apellido</label>
+                    <input type="text" class="form-control" id="apellido2_empleado" name="apellido2_empleado" required>
+                </div>
+                <div class="form-group">
+                    <label for="cedula_empleado">Cédula</label>
+                    <input type="text" class="form-control" id="cedula_empleado" name="cedula_empleado" required>
+                </div>
+                <div class="form-group">
+                    <label for="correo_empleado">Correo Electrónico</label>
+                    <input type="email" class="form-control" id="correo_empleado" name="correo_empleado" required>
+                </div>
+                <div class="form-group">
+                    <label for="contrasena_empleado">Contraseña</label>
+                    <input type="password" class="form-control" id="contrasena_empleado" name="contrasena_empleado" required>
+                </div>
+                <small>La contraseña debe tener al menos 8 caracteres, incluyendo una mayúscula, un número y un carácter especial.</small>
+                <div class="form-group">
+                    <label for="telefono">Teléfono</label>
+                    <input type="text" class="form-control" id="telefono" name="telefono">
+                </div>
+                <div class="form-group custom-file-upload">
+                    <label for="foto_empleado" class="custom-file-label">Seleccionar foto</label>
+                    <input type="file" class="form-control-file" id="foto_empleado" name="foto_empleado" accept="image/*" onchange="previewImage(event)" required>
+                </div>
+                <div id="image-preview-container">
+                    <img id="image-preview" style="display: none;" alt="Vista previa de la imagen" />
+                </div>
+                <button type="submit" class="btn btn-primary">Registrar Empleado</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        //document.addEventListener('DOMContentLoaded', verificarAutenticacion);
+        const token = localStorage.getItem("token");
+
+        function validarFormulario(event) {
+            event.preventDefault();
+            
+            var nombre = document.getElementById('nombre_empleado').value;
+            var apellido1 = document.getElementById('apellido1_empleado').value;
+            var apellido2 = document.getElementById('apellido2_empleado').value;
+            var cedula = document.getElementById('cedula_empleado').value;
+            var correo = document.getElementById('correo_empleado').value;
+            var contrasena = document.getElementById('contrasena_empleado').value;
+            var telefono = document.getElementById('telefono').value;
+            var foto = document.getElementById('foto_empleado').value;
+
+            if (!nombre || !apellido1 || !apellido2 || !cedula || !correo || !contrasena || !foto) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Campos incompletos',
+                    text: 'Por favor, complete todos los campos obligatorios del formulario.',
+                });
+                return false;
+            }
+
+            if (!validarContrasena(contrasena)) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Contraseña inválida',
+                    text: 'La contraseña debe tener al menos 8 caracteres, incluyendo una mayúscula, un número y un carácter especial.',
+                });
+                return false;
+            }
+
+            confirmarRegistro();
+            return false;
+        }
+
+        function confirmarRegistro() {
+            Swal.fire({
+                title: '¿Deseas guardar?',
+                text: "Estás a punto de registrar un nuevo empleado.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, registrar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    registrarEmpleado();
+                }
+            });
+        }
+
+        function registrarEmpleado() {
+            var formData = new FormData(document.getElementById('formEmpleado'));
+            
+            var file = formData.get('foto_empleado');
+            const maxSize = 64 * 1024 * 1024; // 64 MB
+            if (file && file.size > maxSize) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Archivo demasiado grande',
+                    text: 'La imagen es demasiado pesada. Seleccione una imagen menor a 64 MB.',
+                });
+                return;
+            }
+
+            $.ajax({
+                url: '/registerEmployee',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Registro exitoso!',
+                        text: 'El empleado ha sido registrado.',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = '/EscritorioEmpleado?accesstoken='+token;
+                        }
+                    });
+                },
+                error: function(xhr, status, error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error en el registro',
+                        text: xhr.responseJSON ? xhr.responseJSON.mensaje : 'Ocurrió un error al registrar el empleado.',
+                    });
+                }
+            });
+        }
+
+        function validarContrasena(password) {
+            var regex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}|:;<>,.?/~`-]).{8,}$/;
+            return regex.test(password);
+        }
+
+        function previewImage(event) {
+            const imagePreview = document.getElementById('image-preview');
+            const file = event.target.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function() {
+                imagePreview.src = reader.result;
+                imagePreview.style.display = 'block';
+            };
+
+            if (file) {
+                reader.readAsDataURL(file);
+            }
+        }
+    </script>
+</body>
+</html>

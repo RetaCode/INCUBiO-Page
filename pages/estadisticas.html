@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estadísticas</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f1ea;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .table-container {
+            margin-top: 2rem;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 1rem;
+        }
+        #statsTable {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        #statsTable th, #statsTable td {
+            padding: 1rem;
+            border: 1px solid #e5e7eb;
+            text-align: left;
+        }
+        #statsTable th {
+            background-color: #ff6600;
+            color: white;
+        }
+        #statsTable tr:hover {
+            background-color: #f9fafb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Estadísticas de Temperatura y Humedad</h1>
+        </div>
+
+        <canvas id="statsChart" width="400" height="200"></canvas>
+
+        <div class="table-container">
+            <table id="statsTable">
+                <thead>
+                    <tr>
+                        <th>Día</th>
+                        <th>Hora</th>
+                        <th>Humedad (%)</th>
+                        <th>Temperatura (°C)</th>
+                    </tr>
+                </thead>
+                <tbody id="statsTableBody">
+                    <!-- Las filas se cargarán dinámicamente aquí -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Función para cargar datos desde el servidor
+        const cargarDatos = () => {
+            fetch('/obtenerEstadisticas')
+                .then(response => response.json())
+                .then(data => {
+                    // Cargar datos en la tabla
+                    const tableBody = document.getElementById('statsTableBody');
+                    tableBody.innerHTML = '';
+
+                    // Arrays para el gráfico
+                    const dias = [];
+                    const humedades = [];
+                    const temperaturas = [];
+
+                    data.forEach(item => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${item.dia_est}</td>
+                            <td>${item.hora_est}</td>
+                            <td>${item.humedad_est}</td>
+                            <td>${item.temperatura_est}</td>
+                        `;
+                        tableBody.appendChild(row);
+
+                        // Agregar datos al gráfico
+                        dias.push(item.dia_est);
+                        humedades.push(item.humedad_est);
+                        temperaturas.push(item.temperatura_est);
+                    });
+
+                    // Crear gráfico
+                    const ctx = document.getElementById('statsChart').getContext('2d');
+                    const statsChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: dias,
+                            datasets: [
+                                {
+                                    label: 'Humedad (%)',
+                                    data: humedades,
+                                    borderColor: '#00BFFF',
+                                    fill: false,
+                                },
+                                {
+                                    label: 'Temperatura (°C)',
+                                    data: temperaturas,
+                                    borderColor: '#FF4500',
+                                    fill: false,
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error('Error al cargar los datos:', error);
+                });
+        };
+
+        // Cargar datos al iniciar la página
+        document.addEventListener('DOMContentLoaded', cargarDatos);
+    </script>
+</body>
+</html>

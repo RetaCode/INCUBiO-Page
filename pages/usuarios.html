@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usuarios Registrados</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <style>
+        :root {
+            --primary-color: #ff6600;
+            --primary-hover: #cc5200;
+            --background-color: #f4f1ea;
+            --modal-background: #f9f9f9;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background-color);
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            background-color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        .header h1 {
+            color: #333;
+            font-size: 2rem;
+            margin: 0;
+            font-weight: bold;
+        }
+        .table-container {
+            overflow-x: auto;
+            margin: 2rem auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 1rem;
+        }
+        #usuariosTable {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        #usuariosTable th {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+        #usuariosTable td {
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        #usuariosTable tr:hover {
+            background-color: #f9fafb;
+        }
+        .btn {
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+        }
+        .btn-edit {
+            background-color: #10B981;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-right: 0.5rem;
+        }
+        .btn-delete {
+            background-color: #EF4444;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .btn-edit:hover {
+            background-color: #059669;
+        }
+        .btn-delete:hover {
+            background-color: #DC2626;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        .modal-content {
+            background-color: var(--modal-background);
+            margin: 10% auto;
+            padding: 2rem;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 15px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            position: relative;
+        }
+        .close {
+            font-size: 1.5rem;
+            color: #9CA3AF;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        .close:hover {
+            color: #374151;
+        }
+        .input-field {
+            width: 94%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            transition: border-color 0.3s ease;
+        }
+        .input-field:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+        .image-preview-container {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+        .image-preview {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 10px;
+        }
+        .file-input {
+            margin-left: 10px;
+            padding: 10px;
+            border: 2px solid var(--primary-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .file-input:hover {
+            background-color: var(--primary-hover);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Lista de Usuarios</h1>
+        </div>
+
+        <div class="table-container">
+            <table id="usuariosTable">
+                <thead>
+                    <tr>
+                        <th>Foto</th>
+                        <th>ID</th>
+                        <th>Nombre Completo</th>
+                        <th>Correo</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="usuariosTableBody">
+                    <!-- Las filas de usuarios se cargarán dinámicamente aquí -->
+                </tbody>
+            </table>
+        </div>
+
+        <div id="editModal" class="modal">
+            <div class="modal-content bg-white rounded-lg shadow-lg p-6">
+                <span onclick="closeModal()" class="close text-red-500 cursor-pointer">&times;</span>
+                <h3 class="text-xl font-semibold mb-4">Editar Usuario</h3>
+                <form id="editForm">
+                    <label class="block mb-2">Nombre:</label>
+                    <input type="text" name="nombre_usuario" required class="input-field border rounded p-2 mb-4 w-full">
+                    
+                    <label class="block mb-2">Primer Apellido:</label>
+                    <input type="text" name="apellido1_usuario" required class="input-field border rounded p-2 mb-4 w-full">
+                    
+                    <label class="block mb-2">Segundo Apellido:</label>
+                    <input type="text" name="apellido2_usuario" class="input-field border rounded p-2 mb-4 w-full">
+                    
+                    <label class="block mb-2">Correo:</label>
+                    <input type="email" name="correo_usuario" required class="input-field border rounded p-2 mb-4 w-full">
+                    
+                    <label class="block mb-2">Foto:</label>
+                    <div class="image-preview-container mb-4">
+                        <img id="imagePreview" src="" alt="Foto de usuario" class="image-preview w-full h-40 object-cover rounded">
+                        <input type="file" name="foto_usuario" accept="image/*" class="file-input hidden" onchange="previewImage(event)">
+                        <button type="button" class="btn file-input bg-blue-500 text-white rounded p-2 mt-2 hover:bg-blue-600 transition duration-300" onclick="document.querySelector('input[name=\'foto_usuario\']').click();"></button>
+                    </div>
+                    
+                    <button type="submit" background="#ff6600" class="btn save-btn bg-green-500 text-white rounded p-2 hover:bg-green-600 transition duration-300">Guardar Cambios</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        const cargarUsuarios = () => {
+            fetch('/obtenerUsuarios')
+                .then(response => response.json())
+                .then(usuarios => {
+                    const tableBody = document.getElementById('usuariosTableBody');
+                    tableBody.innerHTML = '';
+
+                    usuarios.forEach(usuario => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>
+                                <img src="${usuario.foto_usuario || '/placeholder.png'}" 
+                                    alt="Foto de ${usuario.nombre_usuario}"
+                                    style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;"
+                                    onerror="this.src='/placeholder.png'">
+                            </td>
+                            <td>${usuario.id_usuario}</td>
+                            <td>${usuario.nombre_usuario} ${usuario.apellido1_usuario} ${usuario.apellido2_usuario || ''}</td>
+                            <td>${usuario.correo_usuario}</td>
+                            <td>
+                                <button class="btn-edit" onclick="editarUsuario(${usuario.id_usuario})">Editar</button>
+                                <button class="btn-delete" onclick="eliminarUsuario(${usuario.id_usuario})">Eliminar</button>
+                            </td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error al cargar usuarios:', error);
+                    Swal.fire('Error', 'Error al cargar los usuarios.', 'error');
+                });
+        };
+        
+        const editarUsuario = (id) => {
+            document.getElementById('editModal').style.display = 'block';
+            const form = document.getElementById('editForm');
+
+            fetch(`/obtenerUsuario/${id}`)
+                .then(response => response.json())
+                .then(usuario => {
+                    form.elements['nombre_usuario'].value = usuario.nombre_usuario;
+                    form.elements['apellido1_usuario'].value = usuario.apellido1_usuario;
+                    form.elements['apellido2_usuario'].value = usuario.apellido2_usuario || '';
+                    form.elements['correo_usuario'].value = usuario.correo_usuario;
+                    document.getElementById('imagePreview').src = usuario.foto_usuario || '/placeholder.png';
+                    form.dataset.id = id;
+                })
+                .catch(error => {
+                    console.error('Error al obtener usuario:', error);
+                    Swal.fire('Error', 'Error al cargar los datos del usuario.', 'error');
+                });
+        };
+
+        const closeModal = () => {
+            document.getElementById('editModal').style.display = 'none';
+        };
+
+        const previewImage = (event) => {
+            const reader = new FileReader();
+            reader.onload = function() {
+                document.getElementById('imagePreview').src = reader.result;
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        };
+
+        document.getElementById('editForm').onsubmit = function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const id = this.dataset.id;
+
+            // Verificar que los campos requeridos tengan valor
+            const nombre = formData.get('nombre_usuario');
+            const apellido1 = formData.get('apellido1_usuario');
+            const correo = formData.get('correo_usuario');
+
+            if (!nombre || !apellido1 || !correo) {
+                Swal.fire('Error', 'Los campos nombre, primer apellido y correo son obligatorios', 'error');
+                return;
+            }
+
+            // Mostrar indicador de carga
+            Swal.fire({
+                title: 'Actualizando...',
+                text: 'Por favor espere...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // Si no se seleccionó una nueva imagen, eliminar el campo del FormData
+            const fileInput = formData.get('foto_usuario');
+            if (!fileInput || fileInput.size === 0) {
+                formData.delete('foto_usuario');
+            }
+
+            fetch(`/actualizarUsuario/${id}`, {
+                method: 'PUT',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => Promise.reject(err));
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Éxito',
+                        text: 'Usuario actualizado correctamente'
+                    });
+                    closeModal();
+                    cargarUsuarios();
+                } else {
+                    throw new Error(data.message || 'Error al actualizar el usuario');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message || 'Error al actualizar el usuario'
+                });
+            });
+        };
+
+        const eliminarUsuario = (id) => {
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: "No podrás revertir esto!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ff6600',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, eliminarlo!',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/eliminarUsuario/${id}`, {
+                        method: 'DELETE'
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire('Eliminado!', 'El usuario ha sido eliminado correctamente.', 'success');
+                            cargarUsuarios();
+                        } else {
+                            throw new Error(data.message || 'Error al eliminar el usuario');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error al eliminar el usuario:', error);
+                        Swal.fire('Error', error.message || 'Error al eliminar el usuario.', 'error');
+                    });
+                }
+            });
+        };
+
+        // Cargar usuarios al iniciar la página
+        document.addEventListener('DOMContentLoaded', cargarUsuarios);
+    </script>
+</body>
+</html>

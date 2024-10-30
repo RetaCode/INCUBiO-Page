@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Germinadoras</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <style>
+      :root {
+    --primary-color: #ff6600;
+    --primary-hover: #cc5200;
+    --background-color: #f4f1ea;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background-color);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Encabezado */
+        .header {
+            display: flex;
+            align-items: center;
+            background-color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .header .back-arrow {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-right: 1rem;
+            cursor: pointer;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 2rem;
+            margin: 0;
+            font-weight: bold;
+        }
+
+        /* Estilos del formulario de registro */
+        #registerForm, #editModal .modal-content form {
+            display: grid;
+            gap: 1.5rem;
+            max-width: 500px;
+            margin: 2rem auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            transition: border-color 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 102, 0, 0.1);
+        }
+
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            text-align: center;
+            width: 100%;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        /* Tabla responsiva mejorada */
+        .table-container {
+            overflow-x: auto;
+            margin: 2rem auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 1rem;
+        }
+
+        #germinadorasTable {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 1rem 0;
+        }
+
+        #germinadorasTable th {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        #germinadorasTable th:first-child {
+            border-top-left-radius: 8px;
+        }
+
+        #germinadorasTable th:last-child {
+            border-top-right-radius: 8px;
+        }
+
+        #germinadorasTable td {
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        #germinadorasTable tr:hover {
+            background-color: #f9fafb;
+        }
+
+        /* Botones de acción en la tabla */
+        .btn-edit {
+            background-color: #10B981;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-right: 0.5rem;
+        }
+
+        .btn-delete {
+            background-color: #EF4444;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-edit:hover {
+            background-color: #059669;
+        }
+
+        .btn-delete:hover {
+            background-color: #DC2626;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 2rem;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 15px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h2 {
+            color: #374151;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .close {
+            font-size: 1.5rem;
+            color: #9CA3AF;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close:hover {
+            color: #374151;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .header h1 {
+                font-size: 1.75rem;
+            }
+
+            #registerForm,
+            .modal-content {
+                padding: 1.5rem;
+            }
+
+            .table-container {
+                margin: 1rem -1rem;
+                border-radius: 0;
+            }
+
+            #germinadorasTable th,
+            #germinadorasTable td {
+                padding: 0.75rem;
+            }
+
+            .btn-edit,
+            .btn-delete {
+                display: block;
+                width: 100%;
+                margin: 0.25rem 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .modal-content {
+                margin: 0;
+                width: 100%;
+                height: 100%;
+                border-radius: 0;
+            }
+        }
+    </style>
+    
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <span class="back-arrow">←</span>
+            <h1>Registro de Germinadoras</h1>
+        </div>
+        
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="descripcion">Descripción:</label>
+                <input type="text" id="descripcion" name="descripcion" required>
+            </div>
+            <div class="form-group">
+                <label for="color">Color:</label>
+                <input type="color" id="color" name="color" value="#FFA500"> <!-- El valor predeterminado es naranja -->
+            </div>
+            <div class="form-group">
+                <label for="version">Versión:</label>
+                <select id="version" name="version" required>
+                    <option value="v1">v1</option>
+                    <option value="v2">v2</option>
+                    <option value="v3">v3</option>
+                    <option value="v4">v4</option>
+                </select>
+            </div>
+            <button type="submit" class="btn">Registrar</button>
+        </form>
+
+        <div class="table-container">
+            <table id="germinadorasTable">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Descripción</th>
+                        <th>Color</th>
+                        <th>Versión</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="germinadorasTableBody">
+                    <!-- Contenido dinámico -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Editar Germinadora</h2>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <form id="editForm">
+                <div class="form-group">
+                    <label for="editDescripcion">Descripción:</label>
+                    <input type="text" id="editDescripcion" name="editDescripcion" required>
+                </div>
+                <div class="form-group">
+                    <label for="editColor">Color:</label>
+                    <input type="color" id="editColor" name="editColor" value="editColor"> <!-- El valor predeterminado es naranja -->
+                </div>
+                <div class="form-group">
+                    <label for="editVersion">Versión:</label>
+                    <select id="editVersion" name="editVersion" required>
+                        <option value="v1">v1</option>
+                        <option value="v2">v2</option>
+                        <option value="v3">v3</option>
+                        <option value="v4">v4</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn">Guardar Cambios</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Función para cargar las germinadoras desde la base de datos y mostrarlas en la tabla
+        async function cargarGerminadoras() {
+            try {
+                const response = await fetch('/obtenerGerminadoras');
+                const germinadoras = await response.json();
+                const tableBody = document.getElementById('germinadorasTableBody');
+                tableBody.innerHTML = '';
+    
+                germinadoras.forEach(germinadora => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${germinadora.codigo}</td>
+                        <td>${germinadora.descripcion_germinadora}</td>
+                        <td style="background-color: ${germinadora.color}; color: ${getTextColor(germinadora.color)};">${germinadora.color}</td>
+                        <td>${germinadora.version}</td>
+                        <td>
+                            <button class="btn-edit" onclick="editarGerminadora('${germinadora.codigo}')">Editar</button>
+                            <button class="btn-delete" onclick="eliminarGerminadora('${germinadora.codigo}')">Eliminar</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error al cargar germinadoras:', error);
+            }
+        }
+    
+        // Función para determinar el color del texto según el fondo
+        function getTextColor(hexColor) {
+            const r = parseInt(hexColor.substr(1, 2), 16);
+            const g = parseInt(hexColor.substr(3, 2), 16);
+            const b = parseInt(hexColor.substr(5, 2), 16);
+            const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+            return brightness > 125 ? '#000000' : '#FFFFFF';
+        }
+    
+        // Función para registrar una nueva germinadora
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+    
+            const data = {
+                descripcion: formData.get('descripcion'),
+                color: formData.get('color') || '#FFA500', // Naranja predeterminado en hexadecimal
+                version: formData.get('version'),
+            };
+    
+            Swal.fire({
+                title: '¿Desea guardar esta germinadora?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Guardar',
+                cancelButtonText: 'Cancelar'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        const response = await fetch('/cregistrargerminadora', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(data),
+                        });
+                        if (response.ok) {
+                            Swal.fire('¡Guardado!', 'La germinadora se guardó correctamente.', 'success');
+                            e.target.reset();
+                            cargarGerminadoras();
+                        } else {
+                            Swal.fire('Error', 'Hubo un problema al guardar la germinadora.', 'error');
+                        }
+                    } catch (error) {
+                        console.error(error);
+                        Swal.fire('Error', 'No se pudo conectar con el servidor.', 'error');
+                    }
+                }
+            });
+        });
+    
+        // Función para eliminar una germinadora
+        async function eliminarGerminadora(codigo) {
+            Swal.fire({
+                title: '¿Está seguro?',
+                text: 'Esta acción no se puede deshacer.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        const response = await fetch(`/eliminarGerminadora/${codigo}`, {
+                            method: 'DELETE',
+                        });
+                        if (response.ok) {
+                            Swal.fire('¡Eliminado!', 'La germinadora ha sido eliminada.', 'success');
+                            cargarGerminadoras();
+                        } else {
+                            Swal.fire('Error', 'No se pudo eliminar la germinadora.', 'error');
+                        }
+                    } catch (error) {
+                        console.error(error);
+                        Swal.fire('Error', 'No se pudo conectar con el servidor.', 'error');
+                    }
+                }
+            });
+        }
+    
+        // Función para abrir el modal de edición con los datos de la germinadora seleccionada
+        function editarGerminadora(codigo) {
+            document.getElementById('editModal').style.display = 'block';
+            const form = document.getElementById('editForm');
+    
+            fetch(`/obtenerGerminadora/${codigo}`)
+                .then(response => response.json())
+                .then(germinadora => {
+                    form.elements['editDescripcion'].value = germinadora.descripcion_germinadora;
+                    form.elements['editColor'].value = germinadora.color;
+                    form.elements['editVersion'].value = germinadora.version;
+                    form.dataset.codigo = germinadora.codigo;
+                })
+                .catch(error => console.error('Error al obtener germinadora:', error));
+        }
+    
+        // Cerrar el modal de edición
+        function closeModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+    
+        // Función para guardar los cambios de una germinadora editada
+        document.getElementById('editForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const codigo = form.dataset.codigo;
+            const data = {
+                descripcion: form.elements['editDescripcion'].value,
+                color: form.elements['editColor'].value,
+                version: form.elements['editVersion'].value,
+            };
+    
+            Swal.fire({
+                title: '¿Desea guardar los cambios?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Guardar',
+                cancelButtonText: 'Cancelar'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        const response = await fetch(`/actualizarGerminadora/${codigo}`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(data),
+                        });
+                        if (response.ok) {
+                            Swal.fire('¡Actualizado!', 'Los cambios fueron guardados.', 'success');
+                            closeModal();
+                            cargarGerminadoras();
+                        } else {
+                            Swal.fire('Error', 'Hubo un problema al actualizar la germinadora.', 'error');
+                        }
+                    } catch (error) {
+                        console.error(error);
+                        Swal.fire('Error', 'No se pudo conectar con el servidor.', 'error');
+                    }
+                }
+            });
+        });
+    
+        // Cargar las germinadoras al inicio
+        cargarGerminadoras();
+    </script>
+    
+</body>
+</html>

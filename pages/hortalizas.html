@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Selector de Semilla</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> <!-- Iconos Font Awesome -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!-- SweetAlert -->
+  <style>
+    body {
+      background-color: #f4f1ea;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      padding: 1em;
+      font-size: 24px;
+      color: orange;
+      background-color: #fff;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    .header i {
+      cursor: pointer;
+      margin-right: 10px;
+      font-size: 1.5em;
+    }
+    .card-container {
+      display: flex;
+      gap: 1em;
+      padding: 2em;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .card {
+      background-color: white;
+      width: 250px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+    .card img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+    }
+    .card-content {
+      padding: 1em;
+    }
+    .card-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: orange;
+    }
+    .card-details {
+      font-size: 14px;
+      color: gray;
+      margin-top: 0.5em;
+    }
+    .card-description {
+      margin-top: 0.5em;
+      font-size: 14px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <i class="fas fa-arrow-left" onclick="window.history.back()"></i>
+    <span>Selector de Semilla</span>
+  </div>
+
+  <div class="card-container" id="cardContainer">
+    <!-- Las tarjetas de semillas se agregarán aquí -->
+  </div>
+
+  <script>
+    async function cargarSemillas() {
+      try {
+        const response = await fetch('/cargarSemillas');
+        const semillas = await response.json();
+
+        console.log(semillas);  // Verifica aquí la estructura de los datos recibidos
+
+        const container = document.getElementById('cardContainer');
+        container.innerHTML = ''; // Limpia el contenedor
+
+        semillas.forEach(semilla => {
+            const card = document.createElement('div');
+            card.className = 'card';
+
+            card.innerHTML = `
+                <img src="${semilla.foto_semilla ? semilla.foto_semilla : 'placeholder.jpg'}" alt="${semilla.nombre_semilla}">
+                <div class="card-content">
+                    <div class="card-title">${semilla.nombre_semilla}</div>
+                    <div class="card-details">
+                      Humedad: ${semilla.humedad_semilla}% | Temperatura: ${semilla.temperatura_semilla}°C
+                    </div>
+                    <p class="card-description">${semilla.descripcion_semilla}</p>
+                </div>
+              `;
+
+            card.addEventListener('click', () => seleccionarSemilla(semilla));
+
+            container.appendChild(card);
+          });
+      } catch (error) {
+        console.error('Error al cargar las semillas:', error);
+      }
+    }
+
+    function seleccionarSemilla(semilla) {
+      localStorage.setItem('semillaSeleccionada', JSON.stringify(semilla));
+      
+      // Mostrar alerta con SweetAlert
+      Swal.fire({
+        title: '¡Semilla seleccionada!',
+        text: `Has seleccionado la semilla: ${semilla.nombre_semilla}`,
+        icon: 'success',
+        confirmButtonText: 'Aceptar'
+      });
+    }
+
+    // Llama a la función para cargar las semillas al cargar la página
+    document.addEventListener('DOMContentLoaded', cargarSemillas);
+  </script>
+</body>
+</html>
